@@ -4,36 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Índice Geral - Português Promover</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    
+
     <style>
-        /* --- VARIÁVEIS DE TEMA --- */
         :root {
             --bg-color: #F8F9FA;
             --text-color: #2D3748;
             --border-color: #000000;
             --white: #FFFFFF;
-
-            /* Cores das Categorias - Tema Português */
-            --color-leit: #1976D2; /* Azul Forte - Leitura */
+            --color-leit: #1976D2;
             --bg-leit: #BBDEFB;
-
-            --color-gene: #388E3C; /* Verde - Gêneros Textuais */
+            --color-gene: #388E3C;
             --bg-gene: #C8E6C9;
-
-            --color-coes: #F57C00; /* Laranja - Coesão */
+            --color-coes: #F57C00;
             --bg-coes: #FFE0B2;
-
-            --color-morf: #7B1FA2; /* Roxo - Morfologia */
+            --color-morf: #7B1FA2;
             --bg-morf: #E1BEE7;
-
-            --color-sint: #D32F2F; /* Vermelho - Sintaxe */
+            --color-sint: #D32F2F;
             --bg-sint: #FFCDD2;
-
-            --color-conv: #00796B; /* Teal - Convenções */
+            --color-conv: #00796B;
             --bg-conv: #B2DFDB;
         }
 
@@ -51,16 +43,15 @@
             overflow-x: hidden;
         }
 
-        /* --- HEADER --- */
         .logo-header {
             width: 100%;
             max-width: 600px;
             display: flex;
             justify-content: center;
-            padding: 30px 0 20px 0; 
+            padding: 30px 0 20px 0;
         }
         .logo-img {
-            max-height: 130px; 
+            max-height: 130px;
             width: auto;
             display: block;
         }
@@ -85,7 +76,6 @@
             font-size: 0.9rem;
         }
 
-        /* --- BARRA DE PESQUISA --- */
         .search-container {
             position: relative;
             width: 100%;
@@ -106,20 +96,7 @@
             outline: none;
             transition: all 0.2s ease;
         }
-        .search-input:focus {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px var(--border-color);
-        }
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.2rem;
-            opacity: 0.6;
-        }
 
-        /* --- BADGES DE CATEGORIA --- */
         .category-header {
             display: flex;
             align-items: center;
@@ -143,7 +120,6 @@
         .badge-sint { background-color: var(--color-sint); }
         .badge-conv { background-color: var(--color-conv); }
 
-        /* --- BOTÕES DOS TÓPICOS --- */
         .topic-btn {
             display: flex;
             align-items: center;
@@ -166,12 +142,6 @@
         .topic-btn:hover {
             transform: translate(-2px, -2px);
             box-shadow: 6px 6px 0px var(--border-color);
-            background-color: #FAFAFA;
-        }
-
-        .topic-btn:active {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px var(--border-color);
         }
 
         .topic-btn::before {
@@ -184,7 +154,6 @@
             border-right: 2px solid var(--border-color);
         }
 
-        /* Cores das laterais por categoria */
         .btn-leit::before { background-color: var(--bg-leit); }
         .btn-gene::before { background-color: var(--bg-gene); }
         .btn-coes::before { background-color: var(--bg-coes); }
@@ -192,15 +161,10 @@
         .btn-sint::before { background-color: var(--bg-sint); }
         .btn-conv::before { background-color: var(--bg-conv); }
 
-        .arrow { font-weight: 900; color: #CBD5E0; }
-        .topic-btn:hover .arrow { color: var(--text-color); }
-
-        /* Mensagem de Não Encontrado */
         #no-results {
             text-align: center;
             color: #888;
             margin-top: 30px;
-            font-weight: 600;
             display: none;
         }
 
@@ -209,127 +173,106 @@
             font-size: 0.8rem;
             color: #888;
             text-align: center;
-            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
-    <div class="logo-header">
-        <img src="logo.png" alt="Logo Promover" class="logo-img">
+<div class="logo-header">
+    <img src="logo.png" alt="Logo Promover" class="logo-img">
+</div>
+
+<div class="container">
+    <h1>Índice Geral Português</h1>
+    <p class="subtitle">Foco Estratégico IFCE</p>
+
+    <div class="search-container">
+        <span class="search-icon" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%);">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar conteúdo...">
     </div>
 
-    <div class="container">
-        <h1>Índice Geral Português</h1>
-        <p class="subtitle">Foco Estratégico IFCE</p>
-
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar conteúdo de Português...">
-        </div>
-
-        <!-- MÓDULO 1: LEITURA E SENTIDO -->
-        <div class="content-group">
-            <div class="category-header"><span class="badge badge-leit">📖 Leitura e Sentido</span></div>
-            <a href="compreensao-interpretacao.html" class="topic-btn btn-leit">Compreensão x Interpretação <span class="arrow">➜</span></a>
-            <a href="significacao-palavras.html" class="topic-btn btn-leit">Sinônimos, Antônimos e Ambiguidade <span class="arrow">➜</span></a>
-            <a href="figuras-linguagem.html" class="topic-btn btn-leit">Figuras de Linguagem Básicas <span class="arrow">➜</span></a>
-            <a href="funcoes-linguagem.html" class="topic-btn btn-leit">Funções da Linguagem (Informar x Convencer) <span class="arrow">➜</span></a>
-        </div>
-
-        <!-- MÓDULO 2: TEXTOS NA PRÁTICA -->
-        <div class="content-group">
-            <div class="category-header"><span class="badge badge-gene">📝 Tipologias e Gêneros</span></div>
-            <a href="tipos-textuais.html" class="topic-btn btn-gene">Narrar, Descrever, Argumentar e Instruir <span class="arrow">➜</span></a>
-            <a href="generos-jornalisticos.html" class="topic-btn btn-gene">Crônicas e Artigos de Opinião <span class="arrow">➜</span></a>
-            <a href="textos-multimodais.html" class="topic-btn btn-gene">Tirinhas, Charges e Infográficos <span class="arrow">➜</span></a>
-            <a href="variacao-linguistica.html" class="topic-btn btn-gene">Variação Linguística e Marcas de Oralidade <span class="arrow">➜</span></a>
-        </div>
-
-        <!-- MÓDULO 3: A LÓGICA DO TEXTO -->
-        <div class="content-group">
-            <div class="category-header"><span class="badge badge-coes">🔗 Coesão e Coerência</span></div>
-            <a href="pronomes-retomada.html" class="topic-btn btn-coes">Pronomes: Rastreadores de Sentido <span class="arrow">➜</span></a>
-            <a href="conjuncoes-basicas.html" class="topic-btn btn-coes">Conjunções: Causa, Consequência e Oposição <span class="arrow">➜</span></a>
-            <a href="operadores-argumentativos.html" class="topic-btn btn-coes">Palavras que Mudam a Lógica da Frase <span class="arrow">➜</span></a>
-        </div>
-
-        <!-- MÓDULO 4: MORFOLOGIA APLICADA -->
-        <div class="content-group">
-            <div class="category-header"><span class="badge badge-morf">⚙️ Classes de Palavras</span></div>
-            <a href="estrutura-verbal.html" class="topic-btn btn-morf">Tempos, Modos e Vozes do Verbo <span class="arrow">➜</span></a>
-            <a href="substantivos-adjetivos.html" class="topic-btn btn-morf">O Nome e sua Caracterização <span class="arrow">➜</span></a>
-            <a href="adverbios.html" class="topic-btn btn-morf">Advérbios e Circunstâncias <span class="arrow">➜</span></a>
-        </div>
-
-        <!-- MÓDULO 5: SINTAXE PARA LEITURA -->
-        <div class="content-group">
-            <div class="category-header"><span class="badge badge-sint">🏗️ Estrutura da Frase</span></div>
-            <a href="sujeito-predicado.html" class="topic-btn btn-sint">Sujeito, Predicado e Transitividade <span class="arrow">➜</span></a>
-            <a href="termos-acessorios.html" class="topic-btn btn-sint">Adjuntos (Adnominais e Adverbiais) <span class="arrow">➜</span></a>
-            <a href="periodo-composto.html" class="topic-btn btn-sint">Orações Coordenadas e Subordinadas (Sentido) <span class="arrow">➜</span></a>
-        </div>
-
-        <!-- MÓDULO 6: O PADRÃO DA LÍNGUA -->
-        <div class="content-group">
-            <div class="category-header"><span class="badge badge-conv">✅ Convenções e Regras</span></div>
-            <a href="acentuacao-porques.html" class="topic-btn btn-conv">Acentuação Gráfica e Uso dos Porquês <span class="arrow">➜</span></a>
-            <a href="uso-virgula.html" class="topic-btn btn-conv">Pontuação: O Poder da Vírgula <span class="arrow">➜</span></a>
-            <a href="concordancia-basica.html" class="topic-btn btn-conv">Concordância Verbal e Nominal <span class="arrow">➜</span></a>
-            <a href="regencia-crase.html" class="topic-btn btn-conv">A Lógica da Regência e da Crase <span class="arrow">➜</span></a>
-        </div>
-
-        <div id="no-results">
-            <p>😕 Nenhum tópico encontrado com esse nome.</p>
-        </div>
-
+    <div class="content-group">
+        <div class="category-header"><span class="badge badge-leit">📖 Leitura e Sentido</span></div>
+        <a href="CompreensaoXInterpretacao.html" class="topic-btn btn-leit">Compreensão x Interpretação <span>➜</span></a>
+        <a href="Sinonimos_AntonimoseAmbiguidade.html" class="topic-btn btn-leit">Sinónimos e Ambiguidade <span>➜</span></a>
+        <a href="Figuras_de_Linguagem_Basicas.html" class="topic-btn btn-leit">Figuras de Linguagem <span>➜</span></a>
+        <a href="Funcoes_da_Linguagem_InformarxConvencer.html" class="topic-btn btn-leit">Funções da Linguagem <span>➜</span></a>
     </div>
 
-    <footer>
-        © 2026 Promover Educação
-    </footer>
+    <div class="content-group">
+        <div class="category-header"><span class="badge badge-gene">📝 Tipologias e Gêneros</span></div>
+        <a href="Narrar_Descrever_ArgumentareInstruir.html" class="topic-btn btn-gene">Narrar, Descrever, Argumentar <span>➜</span></a>
+        <a href="Cronicas_e_Artigos_de_Opiniao.html" class="topic-btn btn-gene">Crónicas e Artigos <span>➜</span></a>
+        <a href="Tirinhas_Charges_e_Infograficos.html" class="topic-btn btn-gene">Tirinhas e Charges <span>➜</span></a>
+        <a href="Variacao_Linguistica_e_Marcas_de_Oralidade.html" class="topic-btn btn-gene">Variação Linguística <span>➜</span></a>
+    </div>
 
-    <script>
-        // Lógica de Pesquisa com normalização de acentos
-        const searchInput = document.getElementById('searchInput');
-        const contentGroups = document.querySelectorAll('.content-group');
-        const noResultsMsg = document.getElementById('no-results');
+    <div class="content-group">
+        <div class="category-header"><span class="badge badge-coes">🔗 Coesão e Coerência</span></div>
+        <a href="Pronomes_Rastreadores_de_Sentido.html" class="topic-btn btn-coes">Pronomes Retomada <span>➜</span></a>
+        <a href="Conjuncoes_Causa_Consequencia_e_Oposicao.html" class="topic-btn btn-coes">Conjunções <span>➜</span></a>
+        <a href="Palavras_que_Mudam_a_logica_da_Frase.html" class="topic-btn btn-coes">Operadores Argumentativos <span>➜</span></a>
+    </div>
 
-        searchInput.addEventListener('keyup', function(e) {
-            const term = e.target.value.toLowerCase();
-            const termNormalized = term.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            let totalVisibleGroups = 0;
+    <div class="content-group">
+        <div class="category-header"><span class="badge badge-morf">⚙️ Classes de Palavras</span></div>
+        <a href="Tempos_Modos_e_Vozes_do_Verbo.html" class="topic-btn btn-morf">Verbos <span>➜</span></a>
+        <a href="O_Nome_e_sua_Caracterizacao.html" class="topic-btn btn-morf">Nomes e Adjetivos <span>➜</span></a>
+        <a href="Adverbios_e%20_Circunstancias.html" class="topic-btn btn-morf">Advérbios <span>➜</span></a>
+    </div>
 
-            contentGroups.forEach(group => {
-                const links = group.querySelectorAll('.topic-btn');
-                let hasVisibleLink = false;
+    <div class="content-group">
+        <div class="category-header"><span class="badge badge-sint">🏗️ Estrutura da Frase</span></div>
+        <a href="Sujeito_Predicado_e_Transitividade.html" class="topic-btn btn-sint">Sujeito e Predicado <span>➜</span></a>
+        <a href="Adjuntos_Adnominais_e_Adverbiais.html" class="topic-btn btn-sint">Adjuntos <span>➜</span></a>
+        <a href="Oracoes_Coordenadas_e_Subordinadas_Sentido.html" class="topic-btn btn-sint">Período Composto <span>➜</span></a>
+    </div>
 
-                links.forEach(link => {
-                    const text = link.textContent.toLowerCase();
-                    const textNormalized = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    
-                    if (textNormalized.includes(termNormalized)) {
-                        link.style.display = 'flex';
-                        hasVisibleLink = true;
-                    } else {
-                        link.style.display = 'none';
-                    }
-                });
+    <div class="content-group">
+        <div class="category-header"><span class="badge badge-conv">✅ Convenções e Regras</span></div>
+        <a href="Acentuacao_Grafica_e_Uso_dos_Porques.html" class="topic-btn btn-conv">Acentuação e Porquês <span>➜</span></a>
+        <a href="Pontuacao_O_Poder_da_Víigula.html" class="topic-btn btn-conv">A Vírgula <span>➜</span></a>
+        <a href="ConcordanciaVerbaleNominal.html" class="topic-btn btn-conv">Concordância <span>➜</span></a>
+        <a href="A_Logica_da_Regencia_e_da_Crase.html" class="topic-btn btn-conv">Regência e Crase <span>➜</span></a>
+    </div>
 
-                if (hasVisibleLink) {
-                    group.style.display = 'block';
-                    totalVisibleGroups++;
+    <div id="no-results"><p>😕 Tópico não encontrado.</p></div>
+</div>
+
+<footer>© 2026 Promover Educação</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('keyup', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisibleGroups = 0;
+
+        contentGroups.forEach(group => {
+            const links = group.querySelectorAll('.topic-btn');
+            let hasVisibleLink = false;
+
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (text.includes(term)) {
+                    link.style.display = 'flex';
+                    hasVisibleLink = true;
                 } else {
-                    group.style.display = 'none';
+                    link.style.display = 'none';
                 }
             });
 
-            if (totalVisibleGroups === 0) {
-                noResultsMsg.style.display = 'block';
+            if (hasVisibleLink) {
+                group.style.display = 'block';
+                totalVisibleGroups++;
             } else {
-                noResultsMsg.style.display = 'none';
+                group.style.display = 'none';
             }
         });
-    </script>
+        noResultsMsg.style.display = totalVisibleGroups === 0 ? 'block' : 'none';
+    });
+</script>
 </body>
 </html>

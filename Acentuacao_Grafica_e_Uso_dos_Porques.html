@@ -1,10 +1,725 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acentuação e Porquês - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema: Ortografia e Lógica - Vermelho (Alerta/Erro Ortográfico) e Azul Marinho (Regra/Gramática) */
+            --bg-color: #F8FAFC;
+            --text-color: #0F172A;
+            --border-color: #1E3A8A;
+            --white: #FFFFFF;
+            --theme-light: #DBEAFE;
+            --theme-medium: #3B82F6;
+            --theme-dark: #1D4ED8;
+            --theme-contrast: #E11D48;
+            --theme-accent: #93C5FD;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #EFF6FF; border-left: 4px solid var(--theme-dark); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #1E3A8A; }
+        .highlight-box.warning { background-color: #FFF1F2; border-left-color: #E11D48; color: #9F1239; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--white); background: var(--theme-dark); cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-contrast); color: var(--white); box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">✒️</span> PROMOVER</div>
+        <h1>Língua Portuguesa | IFCE</h1>
+        <p class="subtitle">Acentuação e Uso dos Porquês</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar regra" placeholder="Pesquisar regra ortográfica...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">1. Regras de Acentuação</span>
+            <div class="theory-box">
+                <h3>A Tônica da Palavra</h3>
+                <p>
+                    - <strong>Proparoxítonas:</strong> Tônica na antepenúltima sílaba. <strong>TODAS</strong> são acentuadas. (Lâm-pa-da, má-gi-co).<br>
+                    - <strong>Paroxítonas:</strong> Tônica na penúltima. Acentuam-se as terminadas em L, I(s), N, U(s), PS, Ã(s), R, UM, UNS, X, ÃO(s) e ditongo. (Ca-rá-ter, tá-xi).<br>
+                    - <strong>Oxítonas:</strong> Tônica na última. Acentuam-se as terminadas em A(s), E(s), O(s), EM, ENS. (Ca-fé não entra na regra do EM, mas vo-cê sim).
+                </p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">2. O Novo Acordo Ortográfico</span>
+            <div class="theory-box">
+                <h3>O que caiu?</h3>
+                <p>Ditongos abertos (EI, OI) <strong>perderam o acento nas PAROXÍTONAS</strong>. (I-dei-a, as-sem-blei-a, he-roi-co). Mas continuam acentuados nas oxítonas (he-rói, pa-péis).</p>
+                <div class="highlight-box warning">
+                    <strong>Hiatos:</strong> As letras 'i' e 'u' tônicas formando hiato sozinhas ou com 's' recebem acento (Sa-ú-de, fa-ís-ca). Se seguidas de NH, não têm acento (Ra-i-nha).
+                </div>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">3. O Uso dos Porquês</span>
+            <div class="theory-box">
+                <h3>Os 4 mosqueteiros</h3>
+                <p>
+                    - <strong>Por que (separado/sem acento):</strong> Usado em perguntas ou substituindo "pelo qual". (Por que choras?).<br>
+                    - <strong>Por quê (separado/com acento):</strong> Usado no final de frases, encostado na pontuação. (Você não comeu por quê?).<br>
+                    - <strong>Porque (junto/sem acento):</strong> Respostas e justificativas, equivale a "pois". (Choro porque estou triste).<br>
+                    - <strong>Porquê (junto/com acento):</strong> É um substantivo. Vem sempre acompanhado de determinante (o, um, este). (Não sei o porquê disso).
+                </p>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Iniciar Diagnóstico (30 Q) →</button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!</p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE DADOS - 30 QUESTÕES
+    const questions = [
+// FÁCEIS (1-10)
+        {
+            id: 1, level: "Fácil",
+            text: "As palavras 'médico', 'lâmpada' e 'pássaro' recebem acento gráfico pela mesma regra. Elas são:",
+            options: ["Oxítonas", "Paroxítonas", "Proparoxítonas", "Monossílabos tônicos"],
+            correct: 2,
+            explanation: {
+                correct: "A sílaba mais forte (tônica) é a antepenúltima. A regra de ouro diz que TODAS as proparoxítonas são acentuadas.",
+                options: ["Oxítonas têm a tônica na última sílaba.", "Paroxítonas têm a tônica na penúltima.", "A resposta certa é a C.", "Elas têm mais de uma sílaba."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Assinale a alternativa em que a palavra destacada está acentuada INCORRETAMENTE:",
+            options: ["Ele tomou um CAFÉ.", "Você viu o CAJÚ?", "Eles comeram o VATAPÁ.", "Comprei um CIPÓ."],
+            correct: 1,
+            explanation: {
+                correct: "'Caju' é uma oxítona terminada em 'u'. A regra manda acentuar apenas oxítonas terminadas em A, E, O, EM, ENS.",
+                options: ["Oxítona terminada em E. Correta.", "A resposta certa é a B (erro no caju).", "Oxítona terminada em A. Correta.", "Oxítona terminada em O. Correta."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Preencha a lacuna: 'Não entendo __________ você não estudou para a prova.'",
+            options: ["porque", "por que", "porquê", "por quê"],
+            correct: 1,
+            explanation: {
+                correct: "Em perguntas diretas ou indiretas, significando 'por qual motivo' ou 'pela qual razão', usa-se separado e sem acento.",
+                options: ["Junto é para respostas/causas.", "A resposta certa é a B.", "Com acento junto é substantivo (o porquê).", "Separado e com acento só no fim da frase."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Qual destas palavras é uma PAROXÍTONA acentuada corretamente?",
+            options: ["Mesa", "Árvore", "Fácil", "Sabiá"],
+            correct: 2,
+            explanation: {
+                correct: "'Fá-cil' tem a tônica na penúltima sílaba e é acentuada por terminar em 'L'.",
+                options: ["Paroxítona terminada em A não leva acento.", "É proparoxítona.", "A resposta certa é a C.", "É oxítona."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "Leia a frase: 'Ela chorou ________ perdeu o brinquedo'. A forma correta para preencher a lacuna é:",
+            options: ["por que", "porque", "por quê", "porquê"],
+            correct: 1,
+            explanation: {
+                correct: "O 'porque' (junto e sem acento) introduz uma causa ou explicação. É a resposta/motivo do choro.",
+                options: ["Usado para perguntas.", "A resposta certa é a B.", "Usado antes da pontuação.", "Precisa de um determinante (ex: o porquê)."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "A palavra 'CÉU' é acentuada por ser um:",
+            options: ["Ditongo aberto em monossílabo tônico.", "Proparoxítona.", "Oxítona terminada em U.", "Hiatos de U."],
+            correct: 0,
+            explanation: {
+                correct: "Monossílabos tônicos terminados em ditongos abertos (éu, éi, ói) mantiveram o acento no Novo Acordo (ex: céu, réu, dói).",
+                options: ["A resposta certa é a A.", "Tem apenas uma sílaba.", "Não é oxítona (exige no mínimo duas sílabas).", "Não é hiato."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Qual é o 'porquê' utilizado no final de frases interrogativas, colado ao ponto de interrogação?",
+            options: ["Porque", "Porquê", "Por que", "Por quê"],
+            correct: 3,
+            explanation: {
+                correct: "Sempre que a palavra 'que' encostar em uma pontuação final (., ? ou !), ela ganha força (tônica) e recebe o acento circunflexo.",
+                options: ["Usado para respostas.", "Substantivo.", "Usado no início/meio de perguntas.", "A resposta certa é a D."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "Assinale a alternativa com a grafia correta segundo as regras de acentuação:",
+            options: ["Eles tem muito dinheiro.", "A moça contêm as lágrimas.", "Ele têm paciência.", "Eles têm muitos amigos."],
+            correct: 3,
+            explanation: {
+                correct: "O verbo 'ter' (e 'vir') recebe acento diferencial circunflexo na 3ª pessoa do plural (Eles têm). No singular não tem acento (Ele tem).",
+                options: ["Eles (plural) exige acento 'têm'.", "Moça (singular) no derivado 'conter' é 'contém'.", "Ele (singular) é 'tem'.", "A resposta certa é a D."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "As palavras 'também', 'alguém' e 'ninguém' recebem acento gráfico porque são:",
+            options: ["Proparoxítonas.", "Paroxítonas terminadas em EM.", "Oxítonas terminadas em EM.", "Monossílabos tônicos."],
+            correct: 2,
+            explanation: {
+                correct: "A tônica está na última sílaba e terminam em 'EM'. Oxítonas com mais de uma sílaba terminadas em EM/ENS são acentuadas.",
+                options: ["A tônica é a última.", "A tônica não é a penúltima.", "A resposta certa é a C.", "Têm mais de uma sílaba."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "Preencha: 'O policial queria entender O __________ de tanta violência.'",
+            options: ["porque", "porquê", "por que", "por quê"],
+            correct: 1,
+            explanation: {
+                correct: "Sempre que houver um determinante antes (um artigo 'o', um pronome), a palavra vira substantivo e escreve-se junto e com acento.",
+                options: ["Conjunção explicativa.", "A resposta certa é a B.", "Preposição + pronome.", "Final de frase."]
+            }
+        },
+
+// MÉDIAS (11-20)
+        {
+            id: 11, level: "Médio",
+            text: "De acordo com o Novo Acordo Ortográfico, a palavra 'ideia' perdeu o acento. O mesmo ocorreu com qual palavra abaixo?",
+            options: ["Herói", "Jiboia", "Céu", "Chapéu"],
+            correct: 1,
+            explanation: {
+                correct: "A regra derrubou o acento dos ditongos abertos (ei, oi) APENAS nas palavras paroxítonas (Ji-boi-a, i-dei-a, he-roi-co).",
+                options: ["Oxítona, mantém acento.", "A resposta certa é a B.", "Monossílabo, mantém acento.", "Oxítona, mantém acento."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "Por que a palavra 'SAÚDE' recebe acento agudo no 'U'?",
+            options: ["Porque é uma paroxítona terminada em E.", "Porque é proparoxítona.", "Pela regra do Hiato: a vogal 'u' é tônica, forma sílaba sozinha e não é seguida de NH.", "Porque termina com vogal."],
+            correct: 2,
+            explanation: {
+                correct: "As letras 'i' e 'u' recebem acento quando são a segunda vogal tônica de um hiato, sozinhas na sílaba ou com 's' (sa-ú-de, fa-ís-ca).",
+                options: ["Paroxítona em E não leva acento (parede, moleque).", "Não é proparoxítona.", "A resposta certa é a C.", "A justificativa é o hiato, não a terminação."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "Qual a diferença que o acento gráfico estabelece entre as palavras 'PÔDE' e 'PODE'?",
+            options: ["Não há diferença de sentido, ambas são no presente.", "'Pôde' é pretérito perfeito (passado); 'pode' é presente do indicativo.", "A primeira é verbo, a segunda é substantivo.", "É uma regra abolida pelo Novo Acordo."],
+            correct: 1,
+            explanation: {
+                correct: "É um acento diferencial de tempo verbal que foi mantido pelo Acordo Ortográfico. 'Ele não pôde ir ontem, mas pode hoje'.",
+                options: ["Há diferença temporal.", "A resposta certa é a B.", "Ambos são verbos.", "A regra do acento diferencial foi mantida aqui."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "Leia: 'As ruas ________ passamos estavam alagadas'. O 'por que' correto e sua equivalência são:",
+            options: ["porque / visto que", "por que / pelas quais", "porquê / o motivo", "por quê / para onde"],
+            correct: 1,
+            explanation: {
+                correct: "Quando 'por que' pode ser substituído por 'pelo qual', 'pelos quais', 'pela qual', escreve-se separado e sem acento.",
+                options: ["Não indica causa/explicação aqui.", "A resposta certa é a B.", "Não tem artigo antes.", "Não está no fim e a substituição é gramaticalmente incorreta."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "A palavra 'VOO' não leva mais acento circunflexo (vôo). A regra do Novo Acordo que explica isso é:",
+            options: ["Palavras terminadas em 'O' não são mais acentuadas.", "A abolição do acento no hiato 'OO' e 'EE' (voo, enjoo, leem, creem).", "A palavra virou oxítona.", "Foi um erro do dicionário."],
+            correct: 1,
+            explanation: {
+                correct: "As letras dobradas 'oo' e 'ee' perderam o acento circunflexo que marcava a tonicidade da primeira vogal do hiato.",
+                options: ["Oxítonas em O levam (cipó).", "A resposta certa é a B.", "Continua sendo paroxítona (vo-o).", "Regra oficial."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Assinale o erro no uso dos porquês:",
+            options: ["Ele perguntou por que você não foi.", "Não sei o porquê de tanta confusão.", "Você está rindo porque?", "Eles lutam porque acreditam na vitória."],
+            correct: 2,
+            explanation: {
+                correct: "Se a palavra encosta no ponto de interrogação no final da frase, ela obrigatoriamente ganha o acento circunflexo: 'por quê?'.",
+                options: ["Correto (pergunta indireta).", "Correto (substantivado pelo 'o').", "A resposta certa é a C (deveria ter acento).", "Correto (causa)."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "A palavra 'BÍCEPS' é acentuada pela regra das:",
+            options: ["Proparoxítonas.", "Paroxítonas terminadas em 'PS'.", "Oxítonas terminadas em 'S'.", "Regra dos encontros consonantais."],
+            correct: 1,
+            explanation: {
+                correct: "Apesar de parecer ter três sílabas, a divisão correta é BÍ-CEPS. É uma paroxítona e o grupo 'ps' exige o acento (como fórceps).",
+                options: ["Não é proparoxítona.", "A resposta certa é a B.", "Não é oxítona.", "A regra é da terminação específica."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "Por que 'TÁXI' tem acento e 'SACI' não tem?",
+            options: ["Ambas estão erradas.", "'Táxi' é paroxítona terminada em I (tem acento). 'Saci' é oxítona terminada em I (NÃO tem acento).", "'Táxi' é estrangeirismo.", "O acento do táxi é diferencial."],
+            correct: 1,
+            explanation: {
+                correct: "A regra das paroxítonas acentua as terminadas em i(s). A regra das oxítonas NÃO acentua as terminadas em i(s), apenas A, E, O, EM, ENS.",
+                options: ["A escrita de ambas é correta.", "A resposta certa é a B.", "Táxi já está aportuguesado na ortografia.", "Não difere de outra palavra idêntica."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "A regra de acentuação dos ditongos abertos (ei, oi) mudou, MAS ela foi MANTIDA para palavras:",
+            options: ["Paroxítonas (ex: ideia).", "Oxítonas e monossílabos tônicos (ex: herói, dói).", "Proparoxítonas.", "Para nenhuma, foi totalmente abolida."],
+            correct: 1,
+            explanation: {
+                correct: "O acento só caiu nas paroxítonas. Se o som aberto estiver na última sílaba (herói, papéis) ou for monossílabo (dói, céu), o acento continua.",
+                options: ["O acento caiu justamente nas paroxítonas.", "A resposta certa é a B.", "Proparoxítonas sempre são acentuadas.", "Falso, foi mantida nas exceções descritas."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Identifique a frase em que o acento diferencial NÃO existe mais segundo o Novo Acordo Ortográfico:",
+            options: ["Eu pôde ajudar o rapaz.", "Ele tem / Eles têm.", "Ele vem / Eles vêm.", "Vou parar para comer uma pêra."],
+            correct: 3,
+            explanation: {
+                correct: "O acento diferencial em palavras homógrafas como 'pêra' (fruta) / 'pera' (preposição arcaica) e 'pára' (verbo) / 'para' (preposição) caiu. Apenas 'pôr' (verbo) manteve.",
+                options: ["Pôde manteve.", "Têm manteve.", "A resposta certa é a D.", "Vêm manteve."]
+            }
+        },
+
+// DIFÍCEIS (21-30)
+        {
+            id: 21, level: "Difícil",
+            text: "A palavra 'RAINHA' tem o 'I' tônico formando hiato com o 'A' (ra-i-nha). Por que ela NÃO recebe acento, diferente de 'SAÚDE'?",
+            options: ["Porque o 'I' é uma vogal fraca.", "Porque o hiato seguido do dígrafo 'NH' não recebe acento pela norma ortográfica.", "Foi um erro do Acordo Ortográfico.", "Porque é paroxítona terminada em A."],
+            correct: 1,
+            explanation: {
+                correct: "É a exceção da regra do hiato. Se o 'i' ou 'u' vierem seguidos de 'nh' na sílaba seguinte, o acento é anulado (ex: moinho, campainha).",
+                options: ["Não existe esse conceito para anular a regra.", "A resposta certa é a B.", "É regra estruturada.", "Saúde também termina em 'e' e é paroxítona, e tem acento."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "Qual alternativa traz a sequência CORRETA dos porquês para: 1. ___ não me ligou? / 2. Não liguei ___ esqueci. / 3. Diga-me o ___ do silêncio.",
+            options: ["Por que / por que / porquê", "Porque / porque / por quê", "Por que / porque / porquê", "Por quê / por que / porque"],
+            correct: 2,
+            explanation: {
+                correct: "1) Pergunta direta = Por que. 2) Resposta/causa = porque. 3) Precedido do artigo 'o' (substantivado) = porquê.",
+                options: ["Erro na 2.", "Erro na 1 e 3.", "A resposta certa é a C.", "Erro total."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "Por que a palavra 'HISTÓRIA' tem acento, enquanto 'PARANOIA' perdeu o acento?",
+            options: ["Ambas perderam.", "Ambas têm acento.", "História é paroxítona terminada em ditongo. Paranoia é paroxítona com ditongo aberto 'oi' (que perdeu o acento).", "História é proparoxítona."],
+            correct: 2,
+            explanation: {
+                correct: "'História' (his-tó-ria) é acentuada por ser paroxítona terminada em ditongo. 'Paranoia' (pa-ra-noi-a) perdeu o acento pela regra do ditongo aberto em paroxítonas.",
+                options: ["História manteve.", "Paranoia perdeu.", "A resposta certa é a C.", "A classificação de história como proparoxítona aparente é debatida, mas a regra do ditongo crescente é a matriz primária do acento."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "As palavras derivadas dos verbos 'ter' e 'vir' (manter, reter, intervir) possuem uma regra de acentuação na 3ª pessoa. Assinale a correta:",
+            options: ["Ele mantém / Eles mantém.", "Ele mantém / Eles mantêm.", "Ele mantem / Eles mantêm.", "Ele mantêm / Eles mantêm."],
+            correct: 1,
+            explanation: {
+                correct: "Por serem oxítonas terminadas em 'em', o singular TEM ACENTO agudo ('mantém'). O plural ganha o circunflexo ('mantêm') para diferenciar.",
+                options: ["Falta diferenciar o plural.", "A resposta certa é a B.", "Singular oxítono em EM exige acento agudo (ex: armazém, também).", "Singular usa agudo."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "Em 'As razões ________ luto são muitas', o preenchimento correto é:",
+            options: ["por que (preposição 'por' + pronome relativo 'que' = pelas quais).", "porque", "porquê", "por quê"],
+            correct: 0,
+            explanation: {
+                correct: "Quando a estrutura equivale a 'pelos quais / pelas quais', a preposição 'por' se junta ao pronome relativo 'que', escrevendo-se separado.",
+                options: ["A resposta certa é a A.", "Não é conjunção causal.", "Não tem artigo antes.", "Não está no fim da frase."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Atenção ao acento de intensidade/hiato em vogais repetidas (I e U). Por que 'FEIURA' perdeu o acento agudo no 'U'?",
+            options: ["Porque o U nunca teve acento.", "Segundo o Acordo, o 'i' e o 'u' tônicos em paroxítonas NÃO recebem mais acento quando precedidos de DITONGO (fei-u-ra).", "Porque a palavra é muito longa.", "Porque se tornou oxítona."],
+            correct: 1,
+            explanation: {
+                correct: "O acento no hiato u/i cai se, na mesma palavra (paroxítona), ele vier logo depois de um ditongo decrescente (ex: baiuca, feiura).",
+                options: ["Ele tinha acento antes do acordo.", "A resposta certa é a B.", "Tamanho não afeta a regra.", "A tônica continua na penúltima sílaba."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "Na clássica oração 'O governo PÔR-SE-Á à disposição', o acento no verbo 'pôr':",
+            options: ["Foi abolido.", "Está errado, pois na mesóclise cai o acento.", "Mantém-se obrigatoriamente, pois é o acento diferencial do verbo em oposição à preposição 'por'.", "Foi um erro de digitação."],
+            correct: 2,
+            explanation: {
+                correct: "O verbo 'pôr' é um dos poucos casos em que o acento diferencial sobreviveu intacto para evitar confusão com a preposição.",
+                options: ["Aboliram-se os acentos de pára, pêra e pêlo. Pôr ficou.", "A mesóclise não arranca o acento base do verbo original.", "A resposta certa é a C.", "Uso normativo correto."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "Cuidado com falsos hiatos. Por que a palavra 'RAIZ' leva acento e 'RAIZES' (raízes) também, mas 'JUIZ' não tem acento enquanto 'JUÍZES' tem?",
+            options: ["A regra é falha.", "Raiz deveria ter acento.", "Em 'juiz' (ju-iz) o 'i' forma sílaba com 'z' no singular, logo não é acentuado. No plural (ju-í-zes), o 'i' fica sozinho e leva acento.", "O plural exige acento."],
+            correct: 2,
+            explanation: {
+                correct: "A regra do hiato só acentua se o i/u ficar sozinho na sílaba (ou com S). Em ju-iz e ra-iz, ele fica com Z na sílaba. Em ju-í-zes e ra-í-zes, ele fica sozinho.",
+                options: ["A regra é lógica e fonética.", "Ra-iz não leva acento (i acompanhado de z).", "A resposta certa é a C.", "O plural separa as sílabas isolando o 'i'."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "Qual destas frases usa corretamente a palavra 'PORQUE' (junto e sem acento) com valor de FINALIDADE (para que)?",
+            options: ["Não chore porque a vida é bela.", "Não a julgueis mal, porque não caia ela em depressão.", "Porque você disse isso?", "Eis o porque de tudo."],
+            correct: 1,
+            explanation: {
+                correct: "Raro, mas gramatical: 'porque' acompanhado do verbo no subjuntivo (caia) pode ter sentido de 'para que'. 'Não julgue PARA QUE ela não caia'.",
+                options: ["Aqui é causa/explicação.", "A resposta certa é a B.", "Aqui é 'Por que' (pergunta).", "Aqui é 'porquê' (substantivo)."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "A palavra 'PÁSSARO' e 'RÁPIDO' são acentuadas. Contudo, em verbos transitados da mesma raiz proparoxítona, a acentuação pode cair. O verbo na frase 'Eu valido o ticket' não tem acento (vá-li-do), pois:",
+            options: ["É erro ortográfico.", "A forma verbal 'valido' (eu) tem a tônica na penúltima sílaba (va-LI-do), sendo paroxítona terminada em O (sem acento), diferente do adjetivo VÁ-li-do (proparoxítona).", "O Novo Acordo tirou.", "Verbo nunca tem acento."],
+            correct: 1,
+            explanation: {
+                correct: "É a mudança de classe que muda a tonicidade. O adjetivo é proparoxítono (VÁlido). O verbo 1ª pessoa é paroxítono (eu vaLIdo).",
+                options: ["É ortografia correta.", "A resposta certa é a B.", "O acordo não mexeu nisso.", "Verbos têm acento se caírem nas regras (ex: conterá)."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#1D4ED8', '#3B82F6', '#E11D48', '#1E3A8A'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#1D4ED8', '#3B82F6', '#E11D48', '#1E3A8A'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★★★" : percent >= 60 ? "★★★☆☆" : "★☆☆☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>⚠ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>★ Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

@@ -1,10 +1,720 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Nome e sua Caracterização - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema: Nomes e Características - Verde Floresta (O Nome/Base) e Amarelo Dourado (Caracterização/Luz) */
+            --bg-color: #F0FDF4;
+            --text-color: #0F172A;
+            --border-color: #064E3B;
+            --white: #FFFFFF;
+            --theme-light: #D1FAE5;
+            --theme-medium: #10B981;
+            --theme-dark: #047857;
+            --theme-contrast: #F59E0B;
+            --theme-accent: #A7F3D0;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #F0FDF4; border-left: 4px solid var(--theme-dark); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #064E3B; }
+        .highlight-box.warning { background-color: #FFFBEB; border-left-color: #F59E0B; color: #92400E; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--white); background: var(--theme-dark); cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-contrast); color: var(--white); box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">🏷️</span> PROMOVER</div>
+        <h1>Língua Portuguesa | IFCE</h1>
+        <p class="subtitle">O Nome e sua Caracterização</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar classe...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">1. O Substantivo (O Rei)</span>
+            <div class="theory-box">
+                <h3>A Palavra que Dá Nome</h3>
+                <p>Tudo o que existe (ou imaginamos que existe) tem um nome. O <strong>Substantivo</strong> é o núcleo do grupo nominal. Pode ser concreto (mesa, fada) ou abstrato (depende de alguém para existir: beleza, corrida).</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">2. Os Determinantes (Os Súditos)</span>
+            <div class="theory-box">
+                <h3>Quem trabalha para o Nome?</h3>
+                <p>Quatro classes de palavras servem para acompanhar e caracterizar o substantivo:<br>
+                    - <strong>Adjetivo:</strong> Dá qualidade, defeito ou estado (carro <em>velho</em>).<br>
+                    - <strong>Artigo:</strong> Define ou indefine o nome (<em>o</em> carro / <em>um</em> carro).<br>
+                    - <strong>Numeral:</strong> Indica quantidade ou ordem (<em>dois</em> carros / <em>primeiro</em> carro).<br>
+                    - <strong>Pronome Adjetivo:</strong> Acompanha indicando posse ou posição (<em>meu</em> carro / <em>este</em> carro).</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">3. A Substantivação</span>
+            <div class="theory-box">
+                <h3>A Mágica do Artigo</h3>
+                <p>Se você colocar um artigo na frente de QUALQUER palavra, ela se transforma em um substantivo imediatamente.</p>
+                <div class="highlight-box warning">
+                    <strong>Exemplo de Prova:</strong> Em "O cantar dos pássaros é lindo", a palavra "cantar" deixou de ser verbo e virou substantivo porque foi antecedida pelo artigo "O".
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Iniciar Diagnóstico (30 Q) →</button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!</p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE DADOS - 30 QUESTÕES
+    const questions = [
+// FÁCEIS (1-10)
+        {
+            id: 1, level: "Fácil",
+            text: "Qual é a classe de palavras responsável por dar NOME aos seres, lugares, sentimentos e objetos?",
+            options: ["Adjetivo", "Verbo", "Substantivo", "Advérbio"],
+            correct: 2,
+            explanation: {
+                correct: "O substantivo é a palavra basilar do idioma. Tudo que pode ser nomeado recebe um substantivo.",
+                options: ["Adjetivo dá característica.", "Verbo dá ação.", "A resposta certa é a C.", "Advérbio modifica o verbo."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "A principal função do ADJETIVO em uma frase é:",
+            options: ["Substituir o substantivo.", "Atribuir uma característica, qualidade ou estado ao substantivo.", "Indicar o tempo da ação.", "Ligar duas orações."],
+            correct: 1,
+            explanation: {
+                correct: "O adjetivo existe para detalhar o substantivo (ex: casa GRANDE, menino FELIZ).",
+                options: ["Quem substitui é o pronome.", "A resposta certa é a B.", "Quem indica tempo é o verbo/advérbio.", "Quem liga é a conjunção."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Em 'A menina inteligente passou', a palavra 'A' funciona como:",
+            options: ["Preposição", "Artigo Definido", "Artigo Indefinido", "Pronome Pessoal"],
+            correct: 1,
+            explanation: {
+                correct: "O artigo definido 'A' determina e especifica o substantivo feminino 'menina' (uma menina específica, já conhecida).",
+                options: ["Não está ligando termos exigindo subordinação.", "A resposta certa é a B.", "Artigo indefinido seria 'Uma'.", "Não substitui o nome."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Qual destas palavras é um Substantivo Abstrato?",
+            options: ["Fada", "Pedra", "Amor", "Cachorro"],
+            correct: 2,
+            explanation: {
+                correct: "O amor depende de um ser humano para existir e ser sentido. Logo, é abstrato.",
+                options: ["Fada não existe no mundo real, mas no mundo imaginário ela tem forma própria (é concreto).", "Pedra é concreto.", "A resposta certa é a C.", "Cachorro é concreto."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "Na frase 'DOIS carros bateram', a palavra destacada é um:",
+            options: ["Adjetivo", "Numeral", "Substantivo", "Artigo"],
+            correct: 1,
+            explanation: {
+                correct: "A palavra 'dois' quantifica exatamente o substantivo 'carros', caracterizando a classe dos numerais cardinais.",
+                options: ["Não dá qualidade.", "A resposta certa é a B.", "Carros é o substantivo.", "Não define gênero de forma primária."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "A expressão 'de anjo' na frase 'Ele tem um rosto de anjo' é classificada como:",
+            options: ["Locução Verbal", "Locução Adjetiva", "Locução Adverbial", "Substantivo Composto"],
+            correct: 1,
+            explanation: {
+                correct: "Uma preposição + substantivo que tem a mesma função de um adjetivo (angelical) é chamada de locução adjetiva.",
+                options: ["Não contém verbo.", "A resposta certa é a B.", "Não modifica verbo.", "Não é um nome único."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Quando um pronome ACOMPANHA o substantivo (ex: MEU caderno), ele é chamado de:",
+            options: ["Pronome Substantivo", "Pronome Adjetivo", "Pronome Pessoal", "Artigo"],
+            correct: 1,
+            explanation: {
+                correct: "Se ele acompanha o nome caracterizando sua posse/posição, ele atua como um adjetivo faria. Logo, é um Pronome Adjetivo.",
+                options: ["Substantivo substituiria o nome.", "A resposta certa é a B.", "Pessoal é eu, tu, ele.", "Artigo é o/a, um/uma."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "Identifique o Adjetivo na frase: 'A água gelada refrescou o atleta'.",
+            options: ["Água", "Gelada", "Refrescou", "Atleta"],
+            correct: 1,
+            explanation: {
+                correct: "'Gelada' é a qualidade/estado atribuído ao substantivo 'água' naquele momento.",
+                options: ["É substantivo.", "A resposta certa é a B.", "É verbo.", "É substantivo."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "Na Língua Portuguesa, o adjetivo deve sempre CONCORDAR com o substantivo a que se refere em:",
+            options: ["Gênero (masc/fem) e Número (sing/plural).", "Tempo e Modo.", "Pessoa e Grau.", "Apenas em Gênero."],
+            correct: 0,
+            explanation: {
+                correct: "Regra básica de concordância nominal: menino bonito -> meninos bonitos -> meninas bonitas.",
+                options: ["A resposta certa é a A.", "Isso é para verbos.", "Isso é para verbos/pronomes.", "A concordância é dupla."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "Em 'O sol brilhava no céu', a palavra 'O' serve para:",
+            options: ["Indeterminar o substantivo sol.", "Definir e particularizar o substantivo sol.", "Dar uma característica ao sol.", "Substituir a palavra sol."],
+            correct: 1,
+            explanation: {
+                correct: "O artigo definido 'O' indica que o falante se refere a um sol específico (o nosso), definindo-o de forma clara.",
+                options: ["Quem indefine é o 'Um'.", "A resposta certa é a B.", "Quem dá característica é adjetivo.", "Quem substitui é pronome."]
+            }
+        },
+
+// MÉDIAS (11-20)
+        {
+            id: 11, level: "Médio",
+            text: "Leia: 'O amanhã será melhor'. A palavra 'amanhã' é um advérbio de tempo, mas nesta frase sofreu:",
+            options: ["Conjugação verbal.", "Derivação prefixal.", "Substantivação (Derivação Imprópria).", "Redução fonética."],
+            correct: 2,
+            explanation: {
+                correct: "O uso do artigo 'O' antes do advérbio 'amanhã' forçou a palavra a mudar de classe gramatical, tornando-se um substantivo (o futuro).",
+                options: ["Não é verbo.", "Não ganhou prefixo.", "A resposta certa é a C.", "Não perdeu letras."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "A posição do adjetivo pode mudar o sentido da frase. Qual é a diferença entre 'Um GRANDE homem' e 'Um homem GRANDE'?",
+            options: ["Nenhuma, são sinônimos.", "O primeiro foca no tamanho físico; o segundo na nobreza de caráter.", "O primeiro foca na nobreza/importância; o segundo no tamanho físico (estatura).", "O adjetivo está errado no primeiro caso."],
+            correct: 2,
+            explanation: {
+                correct: "Adjetivos antepostos muitas vezes assumem valor subjetivo/valorativo. Adjetivos pospostos costumam manter o sentido literal/objetivo.",
+                options: ["O sentido muda.", "Está invertido.", "A resposta certa é a C.", "O uso é correto e estilístico."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "Substantivos abstratos também nomeiam AÇÕES derivadas de verbos. Qual destas palavras é um Substantivo Abstrato de Ação?",
+            options: ["O livro", "A beleza", "O beijo", "A tristeza"],
+            correct: 2,
+            explanation: {
+                correct: "'Beijo' é o nome da ação de beijar. Toda ação nomeada (a corrida, o abraço, o estudo) é um substantivo abstrato.",
+                options: ["Concreto (objeto).", "Abstrato de qualidade/estado.", "A resposta certa é a C.", "Abstrato de sentimento."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "Em 'Ele agiu com atitudes DE CRIANÇA', a locução adjetiva 'de criança' pode ser substituída pelo adjetivo erudito correspondente:",
+            options: ["Criançil", "Pueril", "Infantilizado", "Juvenil"],
+            correct: 1,
+            explanation: {
+                correct: "O adjetivo erudito correspondente à locução 'de criança' é 'pueril' (ou infantil). 'Juvenil' refere-se a jovem.",
+                options: ["Não é a forma culta padrão.", "A resposta certa é a B.", "Indica um estado provocado, não essência.", "Refere-se a jovem, não criança."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "O Artigo Indefinido (um, uma) pode ter valor de generalização. Na frase 'UM médico não abandona seu paciente', a palavra 'um' significa:",
+            options: ["Exatamente a quantidade '1'.", "Um médico desconhecido que passou na rua.", "Qualquer médico (toda a classe médica).", "Nenhuma das anteriores."],
+            correct: 2,
+            explanation: {
+                correct: "Neste contexto, 'um médico' atua com valor genérico e universal, significando 'Todo e qualquer médico'.",
+                options: ["Não é numeral aqui.", "Não é alguém específico.", "A resposta certa é a C.", "A alternativa C explica o fenômeno."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Assinale a alternativa onde o substantivo sublinhado é COLETIVO (indica grupo mesmo estando no singular):",
+            options: ["As ÁRVORES caíram.", "A CONSTELAÇÃO brilhava muito.", "Os ALUNOS fugiram.", "As ESTRELAS são lindas."],
+            correct: 1,
+            explanation: {
+                correct: "Constelação é um substantivo no singular que designa um agrupamento plural de seres da mesma espécie (estrelas).",
+                options: ["Apenas substantivo no plural.", "A resposta certa é a B.", "Apenas substantivo no plural.", "Apenas substantivo no plural."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "No sintagma nominal (grupo do nome) 'Os dois primeiros alunos inteligentes', qual palavra atua como o NÚCLEO (a mais importante)?",
+            options: ["Os", "Primeiros", "Alunos", "Inteligentes"],
+            correct: 2,
+            explanation: {
+                correct: "O substantivo é sempre o núcleo do grupo nominal. O artigo, o numeral e o adjetivo estão ali apenas para servi-lo e caracterizá-lo.",
+                options: ["É adjunto (artigo).", "É adjunto (numeral).", "A resposta certa é a C.", "É adjunto (adjetivo)."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "Plural de Substantivos Compostos: A regra geral diz que palavras variáveis (substantivos e adjetivos) vão para o plural. Como fica 'Cachorro-quente'?",
+            options: ["Cachorro-quentes", "Cachorros-quente", "Cachorros-quentes", "Cachorro-quente (invariável)"],
+            correct: 2,
+            explanation: {
+                correct: "Ambas as palavras são variáveis ('cachorro' é substantivo, 'quente' é adjetivo). Portanto, ambas vão para o plural.",
+                options: ["Falta flexionar o primeiro.", "Falta flexionar o segundo.", "A resposta certa é a C.", "Elas variam obrigatoriamente."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "O numeral pode indicar quantidade (cardinal) ou ordem (ordinal). Em 'Dom Pedro SEGUNDO', temos um numeral:",
+            options: ["Cardinal", "Ordinal", "Multiplicativo", "Fracionário"],
+            correct: 1,
+            explanation: {
+                correct: "A palavra 'Segundo' indica a ordem na sucessão dos reis/imperadores, caracterizando a classe dos numerais ordinais.",
+                options: ["Cardinal seria 'Dois'.", "A resposta certa é a B.", "Multiplicativo seria 'Dobro'.", "Fracionário seria 'Meio'."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Cuidado com o adjetivo que atua como advérbio. Na frase 'A garota falou ALTO', a palavra 'alto' está:",
+            options: ["Caracterizando a garota (adjetivo).", "Modificando o verbo falar (advérbio de modo).", "Sendo um substantivo.", "Errada, deveria ser 'alta'."],
+            correct: 1,
+            explanation: {
+                correct: "Quando o adjetivo qualifica a AÇÃO do verbo (o modo como ela falou), ele se torna um advérbio e fica invariável.",
+                options: ["A garota não é 'alto'.", "A resposta certa é a B.", "Não tem artigo na frente.", "Se fosse 'alta', ela qualificaria a garota, mudando o sentido."]
+            }
+        },
+
+// DIFÍCEIS (21-30)
+        {
+            id: 21, level: "Difícil",
+            text: "No IFCE, o artigo pode mudar drasticamente o sentido da palavra (Gênero Aparente). Qual a diferença entre 'O cabeça' e 'A cabeça'?",
+            options: ["Nenhuma, ambos indicam o líder.", "O cabeça é o líder (homem); a cabeça é a parte do corpo.", "Ambos indicam partes do corpo.", "O cabeça está errado gramaticalmente."],
+            correct: 1,
+            explanation: {
+                correct: "A mudança do artigo de feminino para masculino força uma mudança semântica total na palavra, gerando um novo significado.",
+                options: ["A semântica muda.", "A resposta certa é a B.", "O masculino não indica corpo nesse caso.", "Uso culto e dicionarizado."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "Na estrutura 'Cadeira de balanço', a expressão 'de balanço' é:",
+            options: ["Um substantivo composto.", "Um adjetivo simples.", "Uma locução adjetiva qualificando a finalidade da cadeira.", "Uma locução adverbial indicando modo."],
+            correct: 2,
+            explanation: {
+                correct: "Composta por preposição + substantivo, ela atua dando a característica/tipo da cadeira, exercendo função exata de locução adjetiva.",
+                options: ["Cadeira de balanço não é hifenizado como regra geral de composto aqui.", "É composta por duas palavras.", "A resposta certa é a C.", "Não modifica um verbo."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "Derivação Regressiva ou Imprópria ocorrem muito com verbos virando substantivos. Em 'O JANTAR está servido', a palavra jantar:",
+            options: ["Continua sendo verbo, pois indica a ação de comer.", "Tornou-se um substantivo (nome da refeição) graças ao artigo 'O'.", "É um adjetivo pátrio.", "É um erro, o certo é 'A janta'."],
+            correct: 1,
+            explanation: {
+                correct: "O artigo 'O' substantiva o verbo no infinitivo, transformando a ação abstrata no nome concreto da refeição.",
+                options: ["Perde a função verbal direta na sintaxe.", "A resposta certa é a B.", "Não indica local de origem.", "Jantar (subst.) é perfeitamente culto."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "Concordância Nominal: Como fica a concordância do adjetivo posposto a dois substantivos de gêneros diferentes? Ex: Comprei carro e moto __________.",
+            options: ["Novas (concorda só com moto).", "Novos (vai para o masculino plural) ou Nova (concorda com o mais próximo).", "Novo (masculino singular).", "O adjetivo deve ficar invariável."],
+            correct: 1,
+            explanation: {
+                correct: "A regra diz que o adjetivo posposto a vários substantivos concorda com a soma deles (masculino plural) ou com o mais próximo (moto nova).",
+                options: ["Falta a opção do plural genérico.", "A resposta certa é a B.", "Exclui a moto da concordância gramatical plural.", "Adjetivo sempre varia na regra geral."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "Adjetivos compostos indicando CORES: A regra diz que apenas o último varia. Como fica o plural de 'Camisa verde-clara' e 'Terno azul-marinho'?",
+            options: ["Camisas verdes-claras / Ternos azuis-marinhos.", "Camisas verde-claras / Ternos azul-marinhos.", "Camisas verde-claras / Ternos azul-marinho (invariável).", "Ficam todos invariáveis."],
+            correct: 2,
+            explanation: {
+                correct: "A regra manda variar o último (verde-claras). PORÉM, 'azul-marinho' e 'azul-celeste' são exceções absolutas e ficam INVARIÁVEIS.",
+                options: ["O primeiro elemento (verde) não varia.", "Azul-marinho não aceita 's'.", "A resposta certa é a C.", "A regra geral exige variação do último (claras)."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Identifique a classe gramatical da palavra 'UM' na frase: 'Eu só tenho UM lápis, não dois'.",
+            options: ["Artigo Indefinido (pois generaliza o lápis).", "Numeral Cardinal (pois quantifica exatamente em oposição a 'dois').", "Pronome Pessoal.", "Substantivo."],
+            correct: 1,
+            explanation: {
+                correct: "A presença do contraste 'não dois' prova que a intenção da frase é quantificar com exatidão matemática, marcando a palavra como numeral.",
+                options: ["A oposição numérica quebra a indefinição.", "A resposta certa é a B.", "Não substitui pessoa.", "Não nomeia nada."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "O Pronome Adjetivo também atua como Adjunto Adnominal na sintaxe. Qual frase abaixo NÃO contém um pronome adjetivo?",
+            options: ["MEU carro quebrou.", "AQUELA casa é assombrada.", "EU não quero comer.", "NENHUM aluno faltou."],
+            correct: 2,
+            explanation: {
+                correct: "'EU' é pronome pessoal reto e atua como sujeito (Pronome Substantivo). Ele não acompanha um nome, ele é o próprio núcleo.",
+                options: ["Meu acompanha carro.", "Aquela acompanha casa.", "A resposta certa é a C.", "Nenhum acompanha aluno."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "Na estrutura 'Água DE CHUVA' e 'Água PLUVIAL', a relação entre as palavras em destaque evidencia:",
+            options: ["Que a primeira é um verbo e a segunda é advérbio.", "A correspondência exata entre uma Locução Adjetiva e o seu Adjetivo Relacional Erudito.", "Que ambas indicam quantidade.", "Que a gramática normativa condena a primeira forma."],
+            correct: 1,
+            explanation: {
+                correct: "'Pluvial' é o adjetivo derivado do latim que significa exatamente 'referente à chuva' (de chuva).",
+                options: ["Não são verbos.", "A resposta certa é a B.", "Não são numerais.", "Ambas são cultas e corretas."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "Alguns adjetivos NÃO podem vir antes do substantivo sem gerar erro sintático ou bizarrice semântica. Qual frase está ERRADA?",
+            options: ["O bom homem chegou.", "O pobre rapaz chorou.", "A brasileira política é complexa (em vez de A política brasileira).", "A bela casa ruiu."],
+            correct: 2,
+            explanation: {
+                correct: "Adjetivos pátrios (que indicam origem: brasileiro, francês) têm posição sintática fixa após o substantivo. Antecipá-los quebra a estrutura.",
+                options: ["Aceita antecipação perfeitamente.", "Aceita antecipação (sentido de coitado).", "A resposta certa é a C.", "Aceita antecipação estilística."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "Quando vários adjetivos acompanham o mesmo substantivo, não importa a quantidade, eles todos continuam sendo classificados na sintaxe como:",
+            options: ["Predicativos do sujeito obrigatórios.", "Adjuntos Adnominais, pois 'orbitam' e caracterizam o núcleo do sujeito/objeto.", "Complementos nominais.", "Objetos diretos."],
+            correct: 1,
+            explanation: {
+                correct: "Toda palavra (artigo, numeral, pronome, adjetivo) que acompanha o nome e vem 'junto' (ad) do 'nome' atua sintaticamente como adjunto adnominal.",
+                options: ["Predicativo exige verbo de ligação.", "A resposta certa é a B.", "Complemento nominal completa sentido de nomes incompletos (amor A DEUS).", "Objeto direto completa verbo."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#047857', '#10B981', '#F59E0B', '#064E3B'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#047857', '#10B981', '#F59E0B', '#064E3B'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★★★" : percent >= 60 ? "★★★☆☆" : "★☆☆☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>⚠ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>★ Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

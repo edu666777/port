@@ -1,10 +1,717 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tirinhas, Charges e Infográficos - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema: Multimodal - Laranja (Humor/Arte) e Azul Petróleo (Dados/Infográficos) */
+            --bg-color: #FFFBEB;
+            --text-color: #0F172A;
+            --border-color: #1E3A8A;
+            --white: #FFFFFF;
+            --theme-light: #FDE68A;
+            --theme-medium: #F59E0B;
+            --theme-dark: #D97706;
+            --theme-contrast: #1D4ED8;
+            --theme-accent: #BFDBFE;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #EFF6FF; border-left: 4px solid var(--theme-contrast); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #1E3A8A; }
+        .highlight-box.warning { background-color: #FEFCE8; border-left-color: #D97706; color: #92400E; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--white); background: var(--border-color); cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">🎨</span> PROMOVER</div>
+        <h1>Língua Portuguesa | IFCE</h1>
+        <p class="subtitle">Tirinhas, Charges e Infográficos</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">1. Textos Multimodais</span>
+            <div class="theory-box">
+                <h3>A União das Linguagens</h3>
+                <p>As Tirinhas, Charges e Infográficos são textos <strong>multimodais</strong> (ou mistos). Eles misturam a <strong>Linguagem Verbal</strong> (palavras escritas) com a <strong>Linguagem Não Verbal</strong> (desenhos, cores, setas, expressões faciais). No IFCE, ignorar a imagem e ler só o texto vai te fazer errar a questão.</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">2. Tirinha vs. Charge</span>
+            <div class="theory-box">
+                <h3>Formatos Diferentes</h3>
+                <p>- <strong>Tirinha:</strong> Tem sequência (geralmente 3 a 4 quadros). Conta uma pequena história (narrativa) com personagens fixos (Mafalda, Calvin). Traz humor ou reflexão.<br>
+                    - <strong>Charge:</strong> Geralmente tem <strong>um único quadro</strong>. É altamente crítica, focada em um problema social ou político <strong>atual</strong>. Usa exagero (caricatura) para satirizar a realidade.</p>
+                <div class="highlight-box warning">
+                    <strong>Cuidado! A Charge tem prazo de validade.</strong> Se você ler uma charge de 2010 sobre política hoje, pode não entender a piada, pois ela depende do contexto histórico daquela semana.
+                </div>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">3. Infográficos</span>
+            <div class="theory-box">
+                <h3>O Visual a Favor da Informação</h3>
+                <p>O infográfico não quer fazer rir. Ele quer <strong>informar de forma rápida e visual</strong>. Ele pega dados complexos, números e pesquisas e os transforma em mapas, gráficos e ícones fáceis de ler. A função da linguagem predominante nele é a <strong>Referencial</strong>.</p>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Iniciar Diagnóstico (30 Q) →</button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!</p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE DADOS - 30 QUESTÕES
+    const questions = [
+// FÁCEIS (1-10)
+        {
+            id: 1, level: "Fácil",
+            text: "Qual é a característica visual básica de uma 'Tirinha'?",
+            options: ["É composta por apenas um grande quadro sem falas.", "É formada por uma sequência curta de quadros, geralmente de 3 a 4.", "Não possui desenhos, apenas textos longos.", "É sempre pintada em preto e branco."],
+            correct: 1,
+            explanation: {
+                correct: "A tirinha tem esse nome justamente por ser uma 'tira' sequencial de imagens que narra um evento curto.",
+                options: ["Isso costuma ser a charge.", "A correta é a B.", "Tirinha mistura texto e imagem.", "Pode ser colorida ou P&B."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Quando lemos uma charge ou tirinha, a expressão facial do personagem, o cenário e as cores são classificados como:",
+            options: ["Linguagem Verbal.", "Linguagem Não Verbal.", "Linguagem Exclusivamente Sonora.", "Erro de impressão."],
+            correct: 1,
+            explanation: {
+                correct: "Tudo o que comunica sem usar palavras escritas ou faladas é linguagem não verbal.",
+                options: ["Verbal refere-se ao texto/palavras.", "A correta é a B.", "Esses textos são visuais, não sonoros.", "São elementos vitais do gênero."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Qual é o principal objetivo de um Infográfico?",
+            options: ["Fazer o leitor rir com ironias políticas.", "Contar uma história de ficção científica.", "Transmitir informações ou dados complexos de forma visual, rápida e clara.", "Convencer o leitor a votar em um candidato."],
+            correct: 2,
+            explanation: {
+                correct: "O infográfico (info + gráfico) organiza dados (números, mapas) usando arte visual para facilitar o entendimento.",
+                options: ["Isso é papel da charge.", "Isso é um conto/HQ.", "A correta é a C.", "Isso é propaganda política."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Uma Charge costuma fazer críticas a:",
+            options: ["Problemas políticos, sociais e do cotidiano atual.", "Apenas aos costumes de civilizações antigas.", "Assuntos puramente matemáticos.", "Animais de estimação sem dono."],
+            correct: 0,
+            explanation: {
+                correct: "A charge é uma ferramenta jornalística para criticar, com humor e acidez, a realidade do momento em que é publicada.",
+                options: ["A correta é a A.", "A charge é atual, focada no presente.", "Isso seria um infográfico/artigo.", "Tema muito restrito, a charge é ampla e sociopolítica."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "Textos que misturam imagens e palavras, como as tirinhas e os infográficos, são chamados de:",
+            options: ["Textos unimodais.", "Textos mistos ou multimodais.", "Textos verbais puros.", "Textos literários longos."],
+            correct: 1,
+            explanation: {
+                correct: "A multimodalidade ocorre quando duas ou mais linguagens (verbal e não verbal) trabalham juntas para criar sentido.",
+                options: ["Unimodal usa só uma linguagem.", "A correta é a B.", "Têm forte presença de imagens.", "Geralmente são curtos e de rápida leitura."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "Na tirinha, as falas e os pensamentos dos personagens são colocados dentro de:",
+            options: ["Retângulos no rodapé da página.", "Balões com formatos variados (fala, pensamento, grito).", "Letras invisíveis.", "Gráficos de pizza."],
+            correct: 1,
+            explanation: {
+                correct: "Os balões são o recurso clássico das HQs e tirinhas para delimitar e tipificar o discurso do personagem.",
+                options: ["Retângulos (recordatórios) são para o narrador.", "A correta é a B.", "O texto precisa ser lido.", "Gráficos pertencem aos infográficos."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Qual elemento gráfico abaixo NÃO é comum de se encontrar em um Infográfico?",
+            options: ["Porcentagens numéricas.", "Gráficos de barras.", "Balões de humor com piadas sobre o cotidiano.", "Mapas e ícones ilustrativos."],
+            correct: 2,
+            explanation: {
+                correct: "O infográfico tem caráter informativo e sério (função referencial). Não costuma usar balões de piada.",
+                options: ["Comum para expor dados.", "Comum para organizar dados.", "A correta é a C.", "Comum para espacializar informações."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "O exagero intencional nos traços físicos de um político desenhado em uma charge recebe o nome de:",
+            options: ["Fotografia.", "Caricatura.", "Paisagismo.", "Infografia."],
+            correct: 1,
+            explanation: {
+                correct: "A caricatura deforma feições (nariz grande, queixo pontudo) para ridicularizar ou evidenciar traços da personalidade da figura pública.",
+                options: ["Foto é registro real sem distorção desenhada.", "A correta é a B.", "Desenho de ambientes naturais.", "Arte com dados técnicos."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "Ao responder uma questão sobre uma Tirinha no IFCE, o aluno que foca APENAS no texto escrito e ignora os desenhos:",
+            options: ["Vai acertar mais rápido.", "Estará lendo da forma correta.", "Provavelmente errará, pois o sentido completo depende da imagem.", "Saberá todas as respostas matematicamente."],
+            correct: 2,
+            explanation: {
+                correct: "O humor ou a quebra de expectativa na tirinha muitas vezes está escondido na expressão facial ou no cenário desenhado.",
+                options: ["O texto solto pode enganar.", "Leitura incompleta.", "A correta é a C.", "Português não é matemática visual."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "Tanto a tirinha quanto a charge visam provocar no leitor:",
+            options: ["Vontade de comprar produtos.", "Reflexão, humor ou quebra de expectativa.", "O aprendizado de fórmulas químicas.", "Nenhuma reação, são neutras."],
+            correct: 1,
+            explanation: {
+                correct: "Ambas utilizam a ironia e a surpresa (o 'punchline') no último quadro ou na imagem para fazer o leitor pensar ou rir.",
+                options: ["Isso é propaganda.", "A correta é a B.", "Isso é livro didático.", "Ambas são opinativas e intencionais."]
+            }
+        },
+
+// MÉDIAS (11-20)
+        {
+            id: 11, level: "Médio",
+            text: "Qual é a principal diferença estrutural e narrativa entre Tirinha e Charge?",
+            options: ["A charge tem 4 quadros; a tirinha tem 1.", "A tirinha constrói uma pequena narrativa (início, meio e fim) em sequência; a charge condensa a crítica em um painel único.", "Ambas não têm imagens.", "A charge usa linguagem verbal apenas."],
+            correct: 1,
+            explanation: {
+                correct: "Tirinha exige progressão de tempo (sequência). Charge exige síntese do momento em um único choque visual.",
+                options: ["É o inverso.", "A correta é a B.", "Ambas usam imagens (multimodais).", "Ambas usam imagens e texto."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "Por que afirmamos que a Charge é altamente dependente do 'Contexto Histórico'?",
+            options: ["Porque só historiadores podem lê-la.", "Porque se o leitor não souber qual notícia ou escândalo estava ocorrendo naquela semana, não entenderá a crítica.", "Porque fala de fatos de mil anos atrás.", "Porque não usa palavras atuais."],
+            correct: 1,
+            explanation: {
+                correct: "A charge satiriza o jornal do dia. Sem conhecer o cenário sociopolítico daquela época, a imagem perde completamente o sentido.",
+                options: ["Qualquer leitor atualizado entende.", "A correta é a B.", "Fala do presente, não do passado remoto.", "O vocabulário costuma ser atual."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "Tirinhas frequentemente usam a 'Ironia'. Como a ironia se manifesta visualmente e textualmente nesses gêneros?",
+            options: ["Afirmando exatamente o que o desenho está mostrando, sem contradições.", "Criando uma contradição gritante entre o que o personagem diz (texto) e o que ele faz ou a situação em que está (imagem).", "Apagando os balões de fala.", "Pintando tudo de vermelho."],
+            correct: 1,
+            explanation: {
+                correct: "O humor irônico nasce do choque. Ex: O personagem diz 'Adoro a natureza' enquanto joga lixo no chão. O texto e a imagem colidem.",
+                options: ["Isso seria apenas redundante.", "A correta é a B.", "Isso cria ambiguidade, não ironia necessariamente.", "Cor não define ironia sozinha."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "A personagem Mafalda, clássica nas provas do IFCE, é famosa por ser uma criança que questiona o mundo adulto. Isso é um recurso para:",
+            options: ["Tornar o texto infantil e ingênuo.", "Criar estranhamento e crítica social profunda através da visão 'inocente' mas perspicaz de uma criança.", "Vender brinquedos.", "Proibir adultos de lerem as tiras."],
+            correct: 1,
+            explanation: {
+                correct: "Usar a lógica infantil para apontar as falhas do mundo adulto destrói as desculpas complexas da sociedade. É uma sátira brilhante.",
+                options: ["Mafalda não tem nada de ingênua nas tirinhas.", "A correta é a B.", "A intenção é crítica social.", "Adultos são o público-alvo principal da reflexão."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "Ao ler um Infográfico, qual função da linguagem o IFCE espera que você identifique como dominante?",
+            options: ["Função Emotiva (foco nos sentimentos do autor).", "Função Poética (foco na beleza dos dados).", "Função Referencial (foco na transmissão objetiva da informação).", "Função Metalinguística (foco no idioma)."],
+            correct: 2,
+            explanation: {
+                correct: "O infográfico quer ensinar/informar fatos, números e processos com isenção e objetividade máxima.",
+                options: ["Dados não têm sentimentos.", "Embora belo, o objetivo não é a arte pela arte.", "A correta é a C.", "Não ensina sobre palavras."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Se uma charge desenha a balança da justiça 'torta' e pesando para o lado de uma sacola de dinheiro, a mensagem não verbal (implícita) é que:",
+            options: ["A justiça está cobrando impostos.", "O dinheiro resolve problemas.", "A justiça é corrupta e favorece quem tem mais poder financeiro.", "As balanças antigas eram imprecisas."],
+            correct: 2,
+            explanation: {
+                correct: "A balança da justiça deve ser equilibrada. A distorção visual para o lado do dinheiro é a crítica clara e feroz à corrupção judicial.",
+                options: ["A carga semântica do 'torto' indica falha moral.", "A charge critica, não elogia essa prática.", "A correta é a C.", "Interpretação literal ingênua."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "A leitura de um Infográfico é considerada 'não linear'. O que isso significa?",
+            options: ["Que você só pode ler do fim para o começo.", "Que as linhas não são retas.", "Que você não precisa ler da esquerda para a direita obrigatoriamente; o olho pode buscar diferentes dados espalhados na arte.", "Que é impossível de ler."],
+            correct: 2,
+            explanation: {
+                correct: "Textos convencionais exigem leitura linear (linha por linha). Em infográficos, a hierarquia visual (tamanho das letras/gráficos) guia os olhos.",
+                options: ["Não tem ordem única forçada.", "Isso é geometria visual, não padrão de leitura.", "A correta é a C.", "A leitura é facilitada, não impossível."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "Muitas tirinhas brincam com o 'Sentido Literal' x 'Sentido Figurado' para gerar humor. O nome técnico dessa multiplicidade de sentidos da palavra é:",
+            options: ["Pleonasmo.", "Ambiguidade ou Polissemia.", "Sinônimo exato.", "Substantivo."],
+            correct: 1,
+            explanation: {
+                correct: "Quando o Calvin entende uma metáfora ('quebrar o galho') no sentido literal físico, ele explora a polissemia da expressão gerando a piada.",
+                options: ["Pleonasmo é repetição.", "A correta é a B.", "Sinônimos têm o mesmo sentido, não duplo sentido.", "Classe de palavra não gera humor sozinha."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "Nas tirinhas, o formato do balão importa. Um balão pontilhado ou tracejado geralmente indica que o personagem:",
+            options: ["Está gritando.", "Está sussurrando ou falando bem baixinho.", "Está pensando.", "Está ouvindo música alta."],
+            correct: 1,
+            explanation: {
+                correct: "A linguagem visual dos balões é padronizada: ziguezague = grito/rádio; nuvemzinhas = pensamento; pontilhado = sussurro.",
+                options: ["Grito usa balão explosivo (ziguezague).", "A correta é a B.", "Pensamento usa nuvem.", "Música usa notas musicais flutuando."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Embora os Infográficos sejam objetivos (Referenciais), eles podem ser usados de forma tendenciosa? Como?",
+            options: ["Não, números nunca mentem.", "Sim. Alterando a escala dos gráficos ou escondendo dados específicos para favorecer um argumento (Função Apelativa oculta).", "Apenas se tiverem desenhos de políticos.", "Sim, pintando o fundo de preto."],
+            correct: 1,
+            explanation: {
+                correct: "O infográfico seleciona dados. A escolha do que mostrar e de como desenhar as barras pode manipular a percepção de quem lê.",
+                options: ["Números não mentem, mas o criador do gráfico pode manipular a exibição.", "A correta é a B.", "A distorção é estatística, não exige charge no meio.", "Cores induzem emoção, mas não alteram os dados base sozinhas."]
+            }
+        },
+
+// DIFÍCEIS (21-30)
+        {
+            id: 21, level: "Difícil",
+            text: "A 'Intertextualidade' é muito cobrada no IFCE em Charges. O que é uma charge intertextual?",
+            options: ["Uma charge sem texto algum.", "Uma charge que exige que o leitor reconheça a referência a outro texto, obra de arte ou evento histórico conhecido para entender a crítica.", "Uma charge internacional traduzida.", "Uma charge que usa apenas balões grandes."],
+            correct: 1,
+            explanation: {
+                correct: "Quando a charge desenha um político com o formato do quadro 'O Grito' (Edvard Munch), você só entende a piada se conhecer o quadro original.",
+                options: ["Isso seria apenas humor não verbal.", "A correta é a B.", "Tradução não caracteriza a técnica de fundir textos/obras.", "Isso é diagramação gráfica."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "As provas costumam pedir que você infira a 'Tese' implícita em uma charge. Para inferir corretamente, você NÃO deve:",
+            options: ["Atenção aos símbolos desenhados (pombas brancas, algemas).", "Extrapolar, imaginando situações fora do contexto que o autor não propôs.", "Analisar o contraste entre os personagens ricos e pobres desenhados.", "Relacionar a data da charge com as notícias da época."],
+            correct: 1,
+            explanation: {
+                correct: "Inferir é deduzir COM BASE nas pistas que o desenho fornece. Extrapolar é inventar fatos novos baseados em preconceitos pessoais, o que gera erro na prova.",
+                options: ["Leitura visual é obrigatória.", "A correta é a B (o que NÃO deve fazer).", "Contraste social é a base da charge.", "Data é a chave de decodificação."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "O humor das tirinhas do personagem Armandinho (frequentemente com um sapo de estimação) baseia-se num jogo semântico de:",
+            options: ["Humor negro e mórbido.", "Quebra das lógicas engessadas e preconceitos dos adultos através da literalidade e sensibilidade infantil.", "Violência física desenhada (slapstick).", "Citações complexas de física nuclear."],
+            correct: 1,
+            explanation: {
+                correct: "Armandinho ataca o conservadorismo e o preconceito ao questionar o vocabulário ou as ações automáticas e frias dos adultos, desarmando-os.",
+                options: ["Não é a linha editorial dele.", "A correta é a B.", "Esse é o humor do Tom & Jerry, não do Armandinho.", "Ele usa lógica simples, não científica."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "Se um infográfico de um banco apresenta um boneco sorridente mostrando o crescimento das dívidas da população, há um choque entre o formato (Visual) e o conteúdo (Dados). Qual é o erro na peça?",
+            options: ["Não há erro, as pessoas gostam de dívidas.", "Falta de adequação entre a linguagem visual (positiva) e a informação textual (negativa), o que pode confundir ou irritar o leitor.", "O boneco deveria ser maior.", "O gráfico de pizza é redondo."],
+            correct: 1,
+            explanation: {
+                correct: "O texto multimodal exige coerência e ancoragem entre texto e imagem. Um dado triste (endividamento) ilustrado com pessoas felizes quebra essa coesão.",
+                options: ["Não gostam.", "A correta é a B.", "Aumentar o boneco piora a falta de adequação.", "Isso não afeta o tom emocional do dado."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "Em charges focadas em sátira econômica, o recurso da 'Metonímia Visual' é frequente. Qual das opções é um exemplo clássico disso?",
+            options: ["Desenhar o presidente voando.", "Substituir toda a nação americana pelo desenho do 'Tio Sam' ou o capitalismo por um cartola de terno com cifrões nos olhos.", "Escrever 'economia' em letras vermelhas.", "Não desenhar o cenário de fundo."],
+            correct: 1,
+            explanation: {
+                correct: "Metonímia é substituir a parte pelo todo. Desenhar o 'Tio Sam' é uma substituição visual consagrada para representar a máquina governamental dos EUA.",
+                options: ["Isso seria alegoria de poder/desconexão.", "A correta é a B.", "Isso é tipografia de destaque.", "Isso foca no personagem, mas não é metonímia."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Por que as provas do IFCE utilizam tantas tirinhas em suas questões de interpretação?",
+            options: ["Porque os professores não sabem escrever textos longos.", "Para preencher as páginas da prova economizando tinta.", "Porque a tirinha exige habilidades avançadas de leitura e inferência, forçando o candidato a cruzar imagem, ironia e contexto numa única leitura.", "Porque adolescentes só leem quadrinhos."],
+            correct: 2,
+            explanation: {
+                correct: "Tirinha não é 'leitura de criança'. Exige síntese mental, domínio de figuras de linguagem e capacidade de ligar pontos implícitos em 3 quadros.",
+                options: ["É uma falsa premissa.", "Imagens gastam MAIS tinta.", "A correta é a C.", "Generalização errônea."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "Uma charge retrata pessoas cegas sendo guiadas por smartphones na beira de um abismo. O tema principal e a função crítica do texto são, respectivamente:",
+            options: ["Avanço médico e função referencial.", "O perigo do vício em tecnologia/alienação e função apelativa (alerta à sociedade).", "A importância da geolocalização e função emotiva.", "O humor de tombos e função fática."],
+            correct: 1,
+            explanation: {
+                correct: "A metáfora visual das pessoas cegas pelo celular escancara a tese do autor: a tecnologia aliena as pessoas do mundo real (perigo iminente).",
+                options: ["O contexto não é clínico.", "A correta é a B.", "O abismo prova que eles estão em perigo, não se guiando bem.", "O tom é crítico, não pastelão."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "No desenvolvimento histórico dos gêneros, a Charge e o Cartum muitas vezes se confundem. A diferença técnica mais aceita é que:",
+            options: ["A charge é brasileira; o cartum é americano.", "A charge ataca um alvo específico e datado do noticiário; o cartum satiriza comportamentos humanos universais e atemporais (ex: casamento, velhice).", "A charge é colorida; o cartum é em preto e branco.", "Não há diferença nenhuma."],
+            correct: 1,
+            explanation: {
+                correct: "Se você achar o desenho engraçado hoje, amanhã ou daqui a 50 anos (ex: homem numa ilha deserta), é Cartum. Se precisar do jornal de ontem para rir, é Charge.",
+                options: ["A origem geográfica não os define hoje.", "A correta é a B.", "Ambos podem usar qualquer técnica de cor.", "Há essa sutilidade teórica cobrada em certames de alto nível."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "Na estrutura de um Infográfico, o 'Boxe' ou 'Callout' (aquela caixa de texto destacada ao lado de uma imagem) serve para:",
+            options: ["Ancorar a interpretação da imagem, garantindo que o leitor não tire conclusões erradas a partir do desenho gráfico isolado.", "Confundir o leitor com dados inúteis.", "Apenas preencher o espaço em branco da página.", "Fornecer a opinião do diagramador sobre o artigo."],
+            correct: 0,
+            explanation: {
+                correct: "O texto verbal no infográfico serve de âncora: amarra o sentido do gráfico abstrato, garantindo a função puramente informativa (referencial).",
+                options: ["A correta é a A.", "A função é esclarecer, não confundir.", "O design não deve ter ruídos inúteis.", "Opiniões são evitadas na infografia clássica."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "Leia a tirinha sem imagem: Q1: Menino vê placa 'Proibido Pisoteio da Grama'. Q2: Menino arranca a placa. Q3: Ele joga a placa no lixo e senta feliz na grama. O que garante o humor e a interpretação crítica?",
+            options: ["O excesso de verbos no imperativo.", "A transgressão da norma através de uma ação subversiva (não verbal), mostrando a inocência rebelde contra a burocracia adulta.", "A cor verde da grama, estritamente.", "O preço da placa não informado."],
+            correct: 1,
+            explanation: {
+                correct: "O humor quebra a expectativa moral. Espera-se que ele obedeça; em vez disso, ele destrói a proibição (a placa) para validar a liberdade natural (sentar na grama).",
+                options: ["Falta de verbos não é o foco crítico.", "A correta é a B.", "As cores são secundárias à ação (verbo visual).", "Fator econômico irrelevante aqui."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#D97706', '#F59E0B', '#1D4ED8', '#1E3A8A'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#D97706', '#F59E0B', '#1D4ED8', '#1E3A8A'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★★★" : percent >= 60 ? "★★★☆☆" : "★☆☆☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>⚠ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>★ Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

@@ -1,10 +1,719 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variação Linguística - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema: Diversidade e Fala - Roxo (Cultura/Identidade) e Esmeralda (Voz/Oralidade) */
+            --bg-color: #FAF5FF;
+            --text-color: #0F172A;
+            --border-color: #4C1D95;
+            --white: #FFFFFF;
+            --theme-light: #E9D5FF;
+            --theme-medium: #A855F7;
+            --theme-dark: #6B21A8;
+            --theme-contrast: #10B981;
+            --theme-accent: #D8B4FE;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #F3E8FF; border-left: 4px solid var(--theme-dark); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #4C1D95; }
+        .highlight-box.warning { background-color: #FEF2F2; border-left-color: #BE123C; color: #881337; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--white); background: var(--theme-dark); cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-contrast); color: var(--text-color); box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">🗣️</span> PROMOVER</div>
+        <h1>Língua Portuguesa | IFCE</h1>
+        <p class="subtitle">Variação Linguística e Oralidade</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">1. O que é Variação Linguística?</span>
+            <div class="theory-box">
+                <h3>A Língua Viva</h3>
+                <p>A língua não é estática. Ela muda dependendo de <strong>quem</strong> fala, <strong>onde</strong> mora, a <strong>época</strong> em que vive e a <strong>situação</strong> em que se encontra. Nenhuma variação é "errada"; existe o uso <strong>adequado</strong> ou <strong>inadequado</strong> ao contexto.</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">2. Tipos de Variação</span>
+            <div class="theory-box">
+                <h3>Os 4 Eixos Principais</h3>
+                <p>- <strong>Regional (Diatópica):</strong> Muda conforme o lugar. Ex: Macaxeira (NE) / Mandioca (SP) / Aipim (RJ).<br>
+                    - <strong>Social (Diastrática):</strong> Muda conforme o grupo social (idade, profissão). Ex: Gírias de skatistas, jargão de advogados.<br>
+                    - <strong>Histórica (Diacrônica):</strong> Muda com o tempo. Ex: Vossa Mercê -> Vosmecê -> Você.<br>
+                    - <strong>Situacional (Diafásica):</strong> Muda conforme o contexto (Formal x Informal).</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">3. Marcas de Oralidade</span>
+            <div class="theory-box">
+                <h3>Escrevendo como se Fala</h3>
+                <p>São traços da fala espontânea que aparecem no texto escrito. Incluem reduções ("tá" em vez de "está", "pra" em vez de "para"), interjeições ("né?", "tipo assim"), repetições e hesitações.</p>
+                <div class="highlight-box warning">
+                    <strong>Preconceito Linguístico:</strong> É a atitude discriminatória contra pessoas que usam variantes não padrão (geralmente de classes menos favorecidas ou regiões específicas). O IFCE repudia o preconceito linguístico em suas provas.
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Iniciar Diagnóstico (30 Q) →</button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!</p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE DADOS - 30 QUESTÕES
+    const questions = [
+// FÁCEIS (1-10)
+        {
+            id: 1, level: "Fácil",
+            text: "A variação linguística que ocorre devido à diferença de regiões geográficas (ex: dindin no Ceará e geladinho em SP) é chamada de:",
+            options: ["Variação Histórica", "Variação Situacional", "Variação Regional (Diatópica)", "Variação de Idade"],
+            correct: 2,
+            explanation: {
+                correct: "A variação diatópica (regional) trata dos diferentes nomes dados a uma mesma coisa dependendo do estado ou região.",
+                options: ["Histórica lida com o tempo.", "Situacional lida com a formalidade.", "A resposta correta é a C.", "Idade é variação social (diastrática)."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Julgar uma pessoa como inferior, menos inteligente ou ignorante por causa do sotaque ou das gírias que ela usa é um exemplo de:",
+            options: ["Correção gramatical", "Adequação linguística", "Preconceito Linguístico", "Norma culta"],
+            correct: 2,
+            explanation: {
+                correct: "O preconceito linguístico é a discriminação social baseada na forma como grupos não dominantes falam.",
+                options: ["Correção é pedagógica, não discriminatória.", "Adequação é saber a hora certa de usar.", "A resposta correta é a C.", "Norma culta é o padrão escrito de prestígio."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Qual das palavras abaixo é considerada uma 'marca de oralidade' se inserida em um texto escrito?",
+            options: ["Entretanto", "Contudo", "Né", "Portanto"],
+            correct: 2,
+            explanation: {
+                correct: "O 'né' (redução de 'não é') é um marcador de conversação típico da fala espontânea.",
+                options: ["Conjunção formal.", "Conjunção formal.", "A resposta correta é a C.", "Conjunção formal."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Um juiz utilizando termos como 'habeas corpus' e 'jurisprudência' durante um julgamento está empregando uma variação:",
+            options: ["Social (Diastrática) - Jargão profissional", "Regional (Diatópica)", "Histórica (Diacrônica)", "Linguagem infantil"],
+            correct: 0,
+            explanation: {
+                correct: "O jargão é um vocabulário específico de um grupo social ou profissional, caracterizando a variação diastrática.",
+                options: ["A resposta correta é a A.", "Não depende do estado do juiz.", "Não é palavra antiga em desuso.", "É o oposto disso."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "A palavra 'farmácia', que antigamente era escrita com 'ph' (pharmácia), sofreu qual tipo de variação?",
+            options: ["Regional", "Histórica (Diacrônica)", "Situacional", "Gíria"],
+            correct: 1,
+            explanation: {
+                correct: "As mudanças na grafia e no uso das palavras ao longo das décadas ou séculos marcam a variação histórica.",
+                options: ["A escrita mudou no país todo.", "A resposta correta é a B.", "Não depende da formalidade.", "Não é linguagem de nicho informal."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "Ao conversar com um juiz em uma audiência, espera-se que o cidadão utilize uma linguagem mais formal. Ao falar com amigos na praia, usa-se linguagem informal. Essa adaptação é chamada de Variação:",
+            options: ["Situacional (Diafásica)", "Regional", "Histórica", "Preconceituosa"],
+            correct: 0,
+            explanation: {
+                correct: "A variação situacional é a capacidade do falante de adequar sua roupa linguística ao 'evento' em que se encontra.",
+                options: ["A resposta correta é a A.", "A praia e o fórum podem ser na mesma cidade.", "As duas situações ocorrem hoje.", "Isso é adequação, não preconceito."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Na visão da Linguística Moderna adotada nas provas do IFCE, existe a noção absoluta de 'certo' e 'errado' na fala?",
+            options: ["Sim, quem não fala a gramática normativa fala errado.", "Não. Existe o uso 'adequado' ou 'inadequado' dependendo do contexto comunicativo.", "Sim, sotaques são considerados erros.", "Sim, gírias são sempre erradas."],
+            correct: 1,
+            explanation: {
+                correct: "A linguística entende que todas as variantes têm gramática própria e cumprem a função de comunicar. Avalia-se apenas a adequação social ao contexto.",
+                options: ["Visão purista superada.", "A resposta correta é a B.", "Sotaque é identidade, não erro.", "Gíria é adequada entre jovens."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "A redução 'tô' em vez de 'estou' é um fenômeno comum na língua falada. Na redação oficial do IFCE, o uso do 'tô':",
+            options: ["É recomendado para mostrar originalidade.", "É inadequado, pois a redação exige o padrão formal da norma culta.", "É obrigatório no Nordeste.", "Não altera a nota."],
+            correct: 1,
+            explanation: {
+                correct: "A dissertação exige a Variação Situacional de registro FORMAL. Marcas de oralidade são descontadas por inadequação ao gênero.",
+                options: ["Tira pontos preciosos.", "A resposta correta é a B.", "Nordestinos cultos escrevem 'estou' em contextos formais.", "Altera, despontuando por desvio."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "Qual destas frases apresenta Variação Regional típica de algumas regiões do Nordeste?",
+            options: ["O menino está chorando.", "O boy tá bolado.", "O pivete tá no migué.", "O galego aviou e foi simbora."],
+            correct: 3,
+            explanation: {
+                correct: "Palavras como 'galego' (louro) e 'aviar' (apressar) formam um léxico característico da região nordestina.",
+                options: ["Português padrão.", "Gíria jovem urbana (RJ/SP).", "Gíria urbana criminal/rua.", "A resposta correta é a D."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "A 'Norma Padrão' ou 'Norma Culta' da língua portuguesa é:",
+            options: ["A língua falada por todas as pessoas.", "A variante ensinada nas escolas e usada em documentos oficiais, jornais e provas.", "A variante exclusiva de Portugal.", "A pior variante da língua."],
+            correct: 1,
+            explanation: {
+                correct: "A norma culta é a variante de prestígio social, escolhida artificialmente para unificar a escrita oficial de um país.",
+                options: ["As pessoas falam de formas variadas.", "A resposta correta é a B.", "O Brasil tem sua própria norma padrão.", "Nenhuma variante é superior/inferior em si."]
+            }
+        },
+
+// MÉDIAS (11-20)
+        {
+            id: 11, level: "Médio",
+            text: "Quando um idoso diz 'Isso é um pão-duro, um sovina', e um jovem diz 'Esse cara é muito mão de vaca, moscão', estamos diante de uma variação:",
+            options: ["Regional", "Situacional", "Social (Diastrática) por faixa etária", "Diacrônica estrutural"],
+            correct: 2,
+            explanation: {
+                correct: "A diferença de vocabulário gerada pelas diferentes gerações (idade) é uma das facetas da variação diastrática (social).",
+                options: ["Eles podem morar na mesma casa.", "A situação é a mesma (descrever alguém avarento).", "A resposta correta é a C.", "Diacrônica analisa séculos, não apenas avô/neto."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "Qual alternativa apresenta a principal justificativa do Preconceito Linguístico na sociedade brasileira?",
+            options: ["A dificuldade de decorar regras gramaticais.", "A associação da variante não padrão à pobreza, à baixa escolaridade ou a regiões historicamente marginalizadas.", "O excesso de provas de português.", "O uso de estrangeirismos."],
+            correct: 1,
+            explanation: {
+                correct: "O preconceito linguístico é, na raiz, um preconceito social. Não se ataca a palavra 'nós vai', mas sim a classe social que geralmente a profere.",
+                options: ["Regras não geram ódio social.", "A resposta correta é a B.", "Isso gera estresse escolar, não racismo/preconceito.", "Estrangeirismos (startup, feedback) têm prestígio social."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "Leia: 'Pra mim, a vida tá muito difícil'. As marcas 'Pra' e 'tá' representam:",
+            options: ["Erros crasso de alfabetização.", "Marcas de oralidade geradas pelo processo de redução fonética natural da fala rápida.", "Uso de jargão profissional.", "Variação diacrônica erudita."],
+            correct: 1,
+            explanation: {
+                correct: "A lei do menor esforço articulatório na fala faz com que 'para' vire 'pra' e 'está' vire 'tá'. É natural e não reflete falta de inteligência.",
+                options: ["Qualquer doutor diz 'tá' falando com amigos.", "A resposta correta é a B.", "Não pertence a uma profissão.", "Não é antigo, é fenômeno de fala ativo."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "Um texto literário que coloca a fala de um sertanejo da seguinte forma: 'Nóis fumo pra cidade' tem qual intenção principal?",
+            options: ["Cometer um erro ortográfico intencional para ser reprovado.", "Caracterizar a identidade cultural e a origem social do personagem, garantindo verossimilhança (verdade).", "Provar que os nordestinos não estudam.", "Ensinar a gramática normativa."],
+            correct: 1,
+            explanation: {
+                correct: "Na literatura, registrar a fala não padrão é um recurso estilístico genial para dar vida, alma e contexto real ao personagem.",
+                options: ["Literatura não é prova de gramática.", "A resposta correta é a B.", "Trata-se de arte e identidade, não estatística educacional.", "O foco é estético, não didático gramatical."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "O conceito de 'Adequação Linguística' pode ser comparado a:",
+            options: ["Usar a mesma roupa em um casamento e na praia.", "Saber escolher qual variante (roupa linguística) usar dependendo do ambiente e de com quem se fala.", "Falar gírias com o presidente da República.", "Escrever errado de propósito no ENEM."],
+            correct: 1,
+            explanation: {
+                correct: "O falante competente é poliglota na própria língua: sabe usar o padrão na redação e a gíria com os amigos.",
+                options: ["Seria a inadequação situacional.", "A resposta correta é a B.", "Seria alta inadequação.", "Seria inadequação de gênero textual."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Qual figura de linguagem é frequentemente usada para marcar a oralidade e simular a emissão de sons no texto escrito (ex: 'Pof!', 'Buáá')?",
+            options: ["Metáfora", "Pleonasmo", "Onomatopeia", "Paradoxo"],
+            correct: 2,
+            explanation: {
+                correct: "A onomatopeia transporta o barulho bruto e a entonação da fala/ambiente para a tinta do papel.",
+                options: ["Comparação abstrata.", "Repetição.", "A resposta correta é a C.", "Oposição ilógica."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "A Variação Diafásica (Situacional) divide a língua, de forma simplificada, em dois grandes registros. Quais são?",
+            options: ["Certo e Errado.", "Antigo e Moderno.", "Formal (culto) e Informal (coloquial).", "Ceará e São Paulo."],
+            correct: 2,
+            explanation: {
+                correct: "O eixo diafásico mede o grau de intimidade e formalidade da situação comunicativa.",
+                options: ["Conceito purista banido.", "Eixo histórico.", "A resposta correta é a C.", "Eixo regional."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "Assinale a alternativa que traz um 'estrangeirismo', fenômeno de variação em que a língua incorpora palavras de outro idioma.",
+            options: ["Nós vamos ao cinema.", "O backup dos arquivos foi concluído.", "O sinaleiro fechou.", "A mandioca está cozida."],
+            correct: 1,
+            explanation: {
+                correct: "Palavras como backup, mouse e delivery são incorporadas pela tecnologia e globalização, modificando o léxico nacional.",
+                options: ["Português padrão.", "A resposta correta é a B.", "Regionalismo (semáforo).", "Regionalismo."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "Ao corrigir a frase 'Deixa eu fazer isso' para 'Deixe-me fazer isso' numa redação, o professor cobra a adequação à norma padrão envolvendo:",
+            options: ["Colocação Pronominal", "Gírias regionais", "Variação histórica do século XV", "Neologismo"],
+            correct: 0,
+            explanation: {
+                correct: "A norma padrão não aceita pronome oblíquo (me) no início de frases, ao contrário da fala natural do brasileiro (próclise abusiva).",
+                options: ["A resposta correta é a A.", "Não é gíria, é sintaxe falada.", "É regra atual do padrão.", "Não há criação de palavra nova."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Quando a gramática escolar diz que 'Nós fomos' é o único correto e desconsidera o fato de que milhões de brasileiros se comunicam perfeitamente dizendo 'Nós foi', ela está agindo com uma postura:",
+            options: ["Descritiva", "Prescritiva e, muitas vezes, excludente.", "Fonética", "Sociolinguística plural"],
+            correct: 1,
+            explanation: {
+                correct: "A gramática tradicional impõe (prescreve) regras de cima para baixo. A sociolinguística observa (descreve) como a língua é realmente usada.",
+                options: ["Descritiva analisa sem julgar.", "A resposta correta é a B.", "Fonética lida com o som isolado.", "A sociolinguística faria o exato oposto, aceitando o 'nós foi' no contexto informal."]
+            }
+        },
+
+// DIFÍCEIS (21-30)
+        {
+            id: 21, level: "Difícil",
+            text: "A expressão 'língua materna' esconde um mito combatido pela sociolinguística, que é a ideia de que:",
+            options: ["A língua é ensinada só pela mãe.", "Existe uma única língua portuguesa uniforme falada por todos os 200 milhões de brasileiros.", "O português veio de Portugal.", "As crianças aprendem a falar sozinhas."],
+            correct: 1,
+            explanation: {
+                correct: "O mito da 'Unidade Linguística' cega as pessoas para o fato de que o Brasil fala dezenas de 'portugueses' diferentes na prática.",
+                options: ["Não é esse o foco do mito.", "A resposta correta é a B.", "É um fato histórico, não um mito sociolinguístico.", "Crianças precisam de interação social."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "Leia o excerto de Patativa do Assaré: 'Aqui nesta grande praça / Onde tudo é fantasia / Eu quero que você faça / Pra mim uma poesia'. A variante linguística nordestina literária, neste caso, atua para:",
+            options: ["Mostrar a incapacidade de rima do autor.", "Apenas divertir crianças.", "Afirmar a identidade cultural do homem do campo e valorizar a estética de uma variante historicamente estigmatizada.", "Complicar a leitura do texto nas escolas do Sul."],
+            correct: 2,
+            explanation: {
+                correct: "Patativa eleva o 'falar matuto' ao status de arte suprema, quebrando o preconceito de que poesia exige norma culta paulista/carioca.",
+                options: ["As rimas são tecnicamente perfeitas.", "A obra dele é profunda e filosófica.", "A resposta correta é a C.", "A intenção é orgulho cultural, não sabotagem escolar."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "O fenômeno do 'Rotacismo' (troca do 'l' pelo 'r', como em 'pranta' por 'planta' e 'flamengo' por 'framengo') é historicamente um indício de:",
+            options: ["Falta de dentes do falante.", "Herança fonética de antigas línguas ibéricas e de contato entre populações afro-indígenas que encontravam dificuldade no som do 'L'.", "Erro exclusivo de preguiça mental.", "Leitura excessiva de quadrinhos do Chico Bento."],
+            correct: 1,
+            explanation: {
+                correct: "O rotacismo é um fenômeno fonético natural na evolução das línguas (o próprio latim transformou 'flaccus' em 'fraco' no português). Não é ignorância.",
+                options: ["Mito absurdo.", "A resposta correta é a B.", "Mito elitista do preconceito linguístico.", "Chico Bento apenas representa a fala, não a causa."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "A 'Hipercorreção' é um fenômeno sociolinguístico que ocorre quando:",
+            options: ["O falante domina a gramática perfeitamente.", "Um falante de classe menos favorecida, tentando imitar a norma culta para evitar preconceito, cria uma regra falsa (ex: dizer 'as iorgurtes').", "O professor usa caneta vermelha.", "Alguém fala gírias propositalmente."],
+            correct: 1,
+            explanation: {
+                correct: "O medo de errar faz o falante aplicar regras onde elas não existem, forçando plurais ou conjugações absurdas para tentar soar 'chique'.",
+                options: ["Se dominasse, não erraria tentando acertar.", "A resposta correta é a B.", "Ação pedagógica sem relação com o conceito vocal.", "Isso é adequação/estilo."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "O uso de 'A gente fomos' ao invés de 'Nós fomos' ou 'A gente foi' indica uma mistura mental de paradigmas da norma padrão e do coloquial. Isso comprova que:",
+            options: ["A população detesta estudar verbos.", "A língua falada é um sistema altamente complexo e lógico, onde o cérebro tenta concordar o verbo com a pluralidade da ideia ('a gente' = nós).", "A língua portuguesa vai ser extinta.", "É impossível aprender gramática no Brasil."],
+            correct: 1,
+            explanation: {
+                correct: "A 'silepse de número' na fala ('A gente fomos') ocorre porque o cérebro faz a concordância pelo sentido (somos muitos), mostrando uma lógica interna da fala não-padrão.",
+                options: ["Não é repúdio, é processo cognitivo automático.", "A resposta correta é a B.", "Línguas mudam, não extinguem-se por isso.", "A gramática descritiva analisa isso como fenômeno, não falência."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Em um tribunal, um advogado usa o termo 'data vênia' de forma excessiva e desnecessária para responder a uma pergunta simples do juiz. Esse comportamento evidencia um problema de:",
+            options: ["Inadequação situacional por excesso de pedantismo e falta de clareza comunicativa.", "Variação geográfica, pois ele é de outro estado.", "Erro de ortografia.", "Ausência total de vocabulário."],
+            correct: 0,
+            explanation: {
+                correct: "Usar jargão denso (juridiquês) sem necessidade real quebra o propósito número 1 da língua: a comunicação eficiente. O excesso de formalidade também pode ser inadequado.",
+                options: ["A resposta correta é a A.", "Jargão é social, não geográfico aqui.", "A fala é oral, ortografia é escrita.", "Ele tem muito vocabulário, usa mal."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "A Variação Diastrática no eixo do sexo/gênero (ex: mulheres e homens frequentemente utilizando adjetivos ou entonações diferentes no português) é objeto de estudo da:",
+            options: ["Física Quântica.", "Sociolinguística Variacionista.", "Morfologia estrita.", "Sintaxe gerativa."],
+            correct: 1,
+            explanation: {
+                correct: "A Sociolinguística mapeia como fatores sociais (sexo, idade, renda, profissão) afetam e causam a variação do uso das palavras na sociedade.",
+                options: ["Ciência exata.", "A resposta correta é a B.", "Morfologia estuda a forma da palavra isolada.", "Foca em estrutura inata, não no contexto social."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "Leia: 'Vou dar um upgrade no meu mindset para alavancar os leads'. O uso desses estrangeirismos no mundo corporativo moderno tem como principal função sociológica:",
+            options: ["Facilitar o entendimento de idosos.", "Criar um jargão excludente (diastrático) que confere falso status de modernidade e segrega quem não pertence ao grupo dominante.", "Ensinar inglês de graça para os funcionários.", "Proteger a língua portuguesa."],
+            correct: 1,
+            explanation: {
+                correct: "O jargão corporativo em inglês atua como um 'crachá VIP'. Quem entende pertence à elite da empresa; quem não entende é excluído.",
+                options: ["Geralmente os exclui do contexto.", "A resposta correta é a B.", "Não há intenção didática genuína.", "Ameaça a pureza lexical nacional (purismo)."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "Qual é o principal argumento sociolinguístico contra o conceito de que os portugueses de Portugal falam o idioma 'mais certo' que o dos brasileiros?",
+            options: ["O Brasil tem mais dinheiro.", "A língua é viva e autônoma. O Português Brasileiro desenvolveu sua própria gramática fonética e sintática ao longo de séculos, ganhando independência total do modelo europeu.", "Eles falam muito rápido.", "Nós inventamos as gírias primeiro."],
+            correct: 1,
+            explanation: {
+                correct: "Não existe língua matriz imutável. O português do Brasil sofreu influências indígenas, africanas e europeias, tornando-se um sistema linguístico pleno e validado por si mesmo.",
+                options: ["Economia não rege correção linguística.", "A resposta correta é a B.", "Velocidade é percepção fonológica.", "Gírias não atestam correção normativa."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "Quando Mário de Andrade, na Semana de Arte Moderna de 1922, escreveu o romance 'Macunaíma' misturando falares de todas as regiões do Brasil num só texto, seu objetivo político e literário era:",
+            options: ["Envergonhar o Brasil frente a Portugal.", "Criar um mosaico linguístico que representasse a verdadeira identidade nacional e combater o purismo parnasiano que exigia imitar a gramática de Portugal.", "Ensinar fonética em escolas primárias de São Paulo.", "Esconder suas falhas de concordância verbal."],
+            correct: 1,
+            explanation: {
+                correct: "Macunaíma é uma obra-prima de colagem de variações diatópicas (regionais). O modernismo lutou para validar o 'português do Brasil' como arte superior.",
+                options: ["O objetivo era valorização nacional.", "A resposta correta é a B.", "A obra é complexa demais para cartilhas básicas.", "Mário era um estudioso profundo da língua, errava de propósito pela arte."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#6B21A8', '#A855F7', '#10B981', '#059669'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#6B21A8', '#A855F7', '#10B981', '#059669'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★★★" : percent >= 60 ? "★★★☆☆" : "★☆☆☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>⚠ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>★ Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

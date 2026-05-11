@@ -1,10 +1,778 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Lógica da Regência e da Crase - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema focado em Língua Portuguesa (Tons de Azul e Dourado) */
+            --bg-color: #F0F9FF;
+            --text-color: #0F172A;
+            --border-color: #000000;
+            --white: #FFFFFF;
+            --theme-light: #E0F2FE;
+            --theme-medium: #7DD3FC;
+            --theme-dark: #0369A1;
+            --theme-contrast: #D97706;
+            --theme-accent: #0284C7;
+            --theme-text-active: #FFFFFF;
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color:
+                var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding:
+                20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px),
+            linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform:
+                translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform:
+                uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px
+        var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase;
+            letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center;
+        }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px;
+        }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color);
+            border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px;
+            box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px;
+            font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem;
+            color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active);
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid
+        var(--border-color); border-radius: 50px; background-color: var(--white); font-family:
+                'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow:
+                4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px
+        var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+            font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color:
+                var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px;
+            border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform:
+                uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px;
+            background-color: var(--white); border: 2px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative;
+            overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px;
+            background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark);
+            margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px;
+            display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius:
+                8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap;
+            gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #E0F2FE; border-left: 4px solid var(--theme-contrast);
+            padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #075985; }
+        .highlight-box.warning { background-color: #FEF2F2; border-left-color: #BE123C; color: #881337; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size:
+                0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid
+        var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px;
+            margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800;
+            font-size: 0.8rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px
+        0px var(--theme-contrast); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color:
+                var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color:
+                var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px;
+            background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px;
+            margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px
+        rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600;
+            text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px
+        0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid
+        var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color:
+                var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white;
+            border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color:
+                var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white;
+            border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px
+        dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem;
+            margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left:
+                3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700;
+            color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius:
+                20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark);
+            line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color:
+                white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900;
+            cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s;
+            text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color:
+                var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px;
+            display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid
+        var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color);
+            font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">🧠</span> PROMOVER</div>
+        <h1>LÍNGUA PORTUGUESA / 6º AO 9º ANO</h1>
+        <p class="subtitle">A Lógica da Regência e da Crase</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">Fundamentos</span>
+            <div class="theory-box">
+                <h3>O que é Regência?</h3>
+                <p>Regência é a relação de subordinação entre um termo principal (que manda) e um termo complemento (que obedece). O chefe pode ser um <strong>Verbo</strong> (Regência Verbal) ou um <strong>Nome</strong> (Regência Nominal).</p>
+                <div class="highlight-box">
+                    <strong>Dica de Ouro:</strong> O segredo da regência é descobrir se o termo principal exige uma <strong>preposição</strong> para se ligar ao seu complemento (ex: Quem gosta, gosta <em>DE</em> algo).
+                </div>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">Crase</span>
+            <div class="theory-box">
+                <h3>A Fórmula da Crase</h3>
+                <p>A crase não é um acento, é uma <strong>fusão</strong>. O acento grave (`) apenas sinaliza que ocorreu um "choque" entre dois "As".</p>
+                <div class="visual-area">
+                    Preposição A <br>+<br> Artigo A <br>=<br> À
+                </div>
+                <p>Para ter crase, você precisa de um termo que exija a preposição "A" (Regência) e uma palavra feminina que aceite o artigo "A".</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">Atenção</span>
+            <div class="theory-box">
+                <h3>Onde a Crase é Proibida?</h3>
+                <p>Se você errar isso, a rasteira é certa. Não use crase:</p>
+                <ul>
+                    <li>Antes de <strong>palavras masculinas</strong> (andar a pé, venda a prazo).</li>
+                    <li>Antes de <strong>verbos</strong> (começou a chover, disposto a falar).</li>
+                    <li>Antes da maioria dos <strong>pronomes</strong> (falei a ela, pergunte a todos).</li>
+                    <li>Entre palavras repetidas (frente a frente, cara a cara).</li>
+                </ul>
+                <div class="highlight-box warning">
+                    Nunca coloque crase se a palavra seguinte não admitir o artigo feminino "a".
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">
+            Iniciar Diagnóstico (30 Q) →
+        </button>
+    </div>
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">
+                30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!
+            </p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE QUESTÕES (30 QUESTÕES)
+    const questions = [
+        {
+            id: 1, level: "Fácil",
+            text: "Leia a frase: 'O aluno prefere estudar matemática ___ fazer as lições de história.' Qual termo preenche corretamente a lacuna, segundo a norma-padrão?",
+            options: ["do que", "que", "a", "à"],
+            correct: 2,
+            explanation: {
+                correct: "O verbo 'preferir' exige a preposição 'a'. Quem prefere, prefere uma coisa A outra. Não se usa 'do que' nem crase antes de verbo.",
+                options: ["Erro popular muito comum. O verbo preferir rejeita 'do que'.", "Incompleto, falta a preposição 'a' exigida pela regência.", "Certa.", "Incorreto. Nunca se usa crase antes de verbo ('fazer')."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Assinale a alternativa onde o uso da crase é ESTRITAMENTE PROIBIDO:",
+            options: ["Vou à padaria comprar pão.", "O carro virou à esquerda.", "O suspeito ficou frente à frente com o detetive.", "Refiro-me à professora de ciências."],
+            correct: 2,
+            explanation: {
+                correct: "É regra básica: nunca se usa crase entre palavras repetidas que formam expressões (frente a frente, cara a cara, gota a gota).",
+                options: ["Correto o uso da crase. Quem vai, vai A algum lugar (a + a padaria).", "Correto o uso. Locução adverbial feminina de lugar.", "Certa.", "Correto o uso. Quem se refere, se refere A alguém (a + a professora)."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Qual das frases abaixo está com a regência verbal INCORRETA?",
+            options: ["Assistimos o jogo de futebol ontem.", "Obedecemos às regras da escola.", "Simpatizo com o novo professor.", "Aspiramos a um futuro melhor."],
+            correct: 0,
+            explanation: {
+                correct: "O verbo 'assistir' no sentido de ver/presenciar exige a preposição 'A'. O correto seria 'Assistimos AO jogo'.",
+                options: ["Certa. Esta é a errada, pois falta a preposição 'a'.", "Regência correta. Quem obedece, obedece A algo.", "Regência correta. Simpatizar exige a preposição 'com'.", "Regência correta. Aspirar (desejar) exige a preposição 'a'."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Preencha a lacuna: 'Entreguei o caderno ___ aluna nova.'",
+            options: ["a", "à", "para", "na"],
+            correct: 1,
+            explanation: {
+                correct: "O verbo entregar pede objeto indireto com preposição 'a' (entregar a alguém). Juntando com o artigo feminino 'a' de aluna, temos crase: à.",
+                options: ["Faltou o artigo definido para especificar a aluna. Ficaria 'Entreguei o caderno a uma aluna'.", "Certa.", "Coloquialismo excessivo para a norma-padrão nesse contexto direto.", "Incorreto gramaticalmente e muda o sentido."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "Em qual frase a crase foi empregada corretamente antes de horas?",
+            options: ["Chegarei daqui à uma hora.", "O evento começa a partir das 19h.", "O sinal toca pontualmente às 07h.", "Estou te esperando dês das 14h."],
+            correct: 2,
+            explanation: {
+                correct: "Usa-se crase na indicação de horas exatas/determinadas, pois há a fusão da preposição 'a' com o artigo 'as'.",
+                options: ["Incorreto. Antes de artigo indefinido 'uma' indicando tempo futuro não há crase.", "Incorreto. 'A partir de' nunca leva crase, pois 'partir' é verbo.", "Certa.", "Erro ortográfico ('dês') e redundância de preposições ('desde as')."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "Avalie: 'Ele comprou uma televisão ___ prazo.' A lacuna deve ser preenchida com:",
+            options: ["à", "a", "para", "em"],
+            correct: 1,
+            explanation: {
+                correct: "A palavra 'prazo' é um substantivo masculino. Regra vital: não existe crase antes de palavras masculinas.",
+                options: ["Incorreto. Seria crase antes de palavra masculina, um erro grave.", "Certa.", "Foge à estrutura da locução 'venda a prazo'.", "Foge à expressão consagrada na língua ('a prazo')."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Qual verbo possui a mesma regência de 'Gostar' (exigir a preposição DE)?",
+            options: ["Visar", "Aspirar", "Esquecer-se", "Assistir"],
+            correct: 2,
+            explanation: {
+                correct: "Verbos pronominais como 'esquecer-se' e 'lembrar-se' exigem a preposição 'de'. Quem se esquece, se esquece DE algo.",
+                options: ["Incorreto. Visar (objetivar) pede preposição A.", "Incorreto. Aspirar (desejar) pede preposição A.", "Certa.", "Incorreto. Assistir (ver) pede preposição A."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "Preencha: 'O estudante estava disposto ___ colaborar com o projeto.'",
+            options: ["à", "a", "em", "para"],
+            correct: 1,
+            explanation: {
+                correct: "A palavra seguinte é 'colaborar', que é um verbo. É estritamente proibido usar crase antes de verbos.",
+                options: ["Erro crasso. Uso de crase antes de verbo.", "Certa.", "Muda a regência nominal consagrada ('disposto a').", "Embora comum na fala, a regência mais estrita do adjetivo é com 'a'."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "Na frase 'Todos chegaram ___ conclusão de que o teste foi difícil', qual o preenchimento correto?",
+            options: ["na", "à", "a", "em uma"],
+            correct: 1,
+            explanation: {
+                correct: "Quem chega, chega A algum lugar/algo (preposição a). 'Conclusão' é palavra feminina (artigo a). A + A = à.",
+                options: ["Coloquial. A norma culta diz que o verbo 'chegar' exige 'a' e não 'em'.", "Certa.", "Faltou a fusão com o artigo definido feminino exigido por 'conclusão'.", "Foge do artigo definido que a frase pede."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "Qual locução adverbial feminina abaixo DEVE receber o acento indicativo de crase?",
+            options: ["a cavalo", "a noite", "a distancia", "às pressas"],
+            correct: 3,
+            explanation: {
+                correct: "Locuções adverbiais femininas (de modo, tempo, lugar) recebem crase obrigatoriamente (ex: às pressas, à noite, às cegas).",
+                options: ["Incorreto. 'Cavalo' é palavra masculina.", "Incorreto na escrita. Faltou a crase (o correto seria 'à noite').", "Incorreto na escrita. Faltou a crase para ser locução.", "Certa."]
+            }
+        },
+        {
+            id: 11, level: "Médio",
+            text: "A respeito do verbo 'implicar' no sentido de 'acarretar / ter como consequência', assinale a correta:",
+            options: ["Atrasos implicarão em advertência.", "Atrasos implicarão à advertência.", "Atrasos implicarão advertência.", "Atrasos implicarão com a advertência."],
+            correct: 2,
+            explanation: {
+                correct: "No sentido de acarretar/gerar consequência, o verbo 'implicar' é Transitivo Direto. Logo, não exige preposição NENHUMA.",
+                options: ["Erro clássico. Implicar sentido acarretar não aceita preposição 'em'.", "Erro. Uso de crase onde não há preposição 'a'.", "Certa.", "Erro. 'Implicar com' tem sentido de provocar/irritar alguém."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "Avalie o uso da crase: 'Fui à Roma dos imperadores e retornei feliz.' O uso da crase está:",
+            options: ["Incorreto, pois nunca se usa crase antes de cidades.", "Correto, pois a cidade de Roma está sendo especificada (dos imperadores).", "Incorreto, pois Roma é palavra masculina.", "Correto, pois o verbo 'retornar' exige preposição."],
+            correct: 1,
+            explanation: {
+                correct: "A regra 'Vou a, volto da, crase há' se aplica. Quando o nome de lugar vem qualificado/especificado, ele admite artigo, exigindo crase.",
+                options: ["Falso. A regra muda se a cidade estiver especificada com um adjetivo/locução.", "Certa.", "Falso. Roma é uma palavra feminina.", "A justificativa da crase recai sobre a ida ('Fui a'), não o retorno."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "A crase é FACULTATIVA (opcional) em qual das opções abaixo?",
+            options: ["Entreguei o documento à diretora.", "Fizemos referência à sua mãe.", "Vendemos a casa àquele homem.", "Retornamos às 18h."],
+            correct: 1,
+            explanation: {
+                correct: "A crase é opcional antes de pronomes possessivos femininos (minha, tua, sua, nossa). Pode ser 'a sua mãe' ou 'à sua mãe'.",
+                options: ["Incorreto. A crase aqui é obrigatória (A + a diretora).", "Certa.", "Incorreto. A crase na contração a+aquele é obrigatória aqui.", "Incorreto. Crase obrigatória em indicação de horas exatas."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "O médico recomendou ___ paciente que aspirasse ___ ar puro da montanha. (Preencha as lacunas)",
+            options: ["à / o", "a / ao", "à / ao", "a / o"],
+            correct: 0,
+            explanation: {
+                correct: "Recomendou A ALGUÉM (à paciente). Verbo aspirar no sentido de respirar é transitivo direto (não pede preposição, apenas o artigo 'o').",
+                options: ["Certa.", "Erro na primeira lacuna (faltou crase) e na segunda ('aspirar' de cheirar não tem preposição).", "Erro na segunda lacuna. 'Aspirar ao' tem sentido de desejar/almejar.", "Erro na primeira lacuna (faltou a crase em paciente feminina)."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "Marque a alternativa que completa corretamente: 'Disse a verdade ___ pessoas, mas preferiu mentir ___ você.'",
+            options: ["as / à", "às / a", "as / a", "às / à"],
+            correct: 1,
+            explanation: {
+                correct: "Disse a verdade a alguém (a + as = às pessoas). Antes de pronome de tratamento 'você', não se usa crase.",
+                options: ["Faltou a preposição no primeiro 'as', e usou crase errada antes de 'você'.", "Certa.", "Faltou a crase na primeira lacuna.", "Usou crase incorreta antes de 'você'."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Sobre o verbo 'Pagar' e 'Perdoar', a regra diz que se o alvo da ação for uma PESSOA, deve-se usar objeto indireto. Logo, a frase correta é:",
+            options: ["Paguei o mecânico ontem.", "Paguei ao mecânico ontem.", "Perdoei o meu irmão.", "Paguei a conta ao banco."],
+            correct: 1,
+            explanation: {
+                correct: "Regra clássica: Pagar e Perdoar exigem preposição 'a' quando nos referimos a PESSOAS (pagar ao médico, perdoar a Deus).",
+                options: ["Erro de regência. Tratou pessoa como objeto direto.", "Certa.", "Erro de regência. Tratou pessoa como objeto direto. O certo é 'Perdoei AO meu irmão'.", "Esta frase tem conta (coisa) e banco (instituição), mas a resposta B exemplifica a regra da pessoa."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "Em qual oração a crase foi usada corretamente devido ao pronome demonstrativo 'Aquele'?",
+            options: ["Entreguei o prêmio àquele aluno dedicado.", "Aquele menino foi à escola.", "Cheguei àquele que estava perdido.", "Referi-me à aquela situação."],
+            correct: 0,
+            explanation: {
+                correct: "O verbo 'entregar' pede 'a'. Esse 'a' se funde com o 'A' inicial do pronome 'aquele', formando 'àquele'.",
+                options: ["Certa.", "A crase em 'à escola' está certa, mas o foco da questão é a fusão no pronome 'Aquele', que ocorre na A.", "Redundância e falta de clareza.", "Erro ortográfico terrível. O certo seria 'àquela' e não 'à aquela'."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "Complete: 'Ela foi ___ Bahia, depois foi ___ Londres, e por fim ___ França.'",
+            options: ["a / a / à", "à / a / à", "à / à / a", "a / à / a"],
+            correct: 1,
+            explanation: {
+                correct: "Dica: Vou A, volto DA, crase há (Bahia, França). Vou A, volto DE, crase pra quê? (Londres).",
+                options: ["Erro na primeira. Bahia aceita artigo (volto da Bahia).", "Certa.", "Erro na segunda. Londres não aceita artigo (volto de Londres).", "Erros múltiplos nas regras de localidade."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "Em 'Daqui ___ pouco iremos embora', a lacuna é preenchida por:",
+            options: ["há", "à", "a", "ah"],
+            correct: 2,
+            explanation: {
+                correct: "Para indicar tempo futuro ou distância geométrica, usamos a preposição pura 'a'. 'Há' é para tempo passado.",
+                options: ["Incorreto. 'Há' (do verbo haver) indica tempo transcorrido (passado).", "Incorreto. 'Pouco' é palavra masculina, proibido usar crase.", "Certa.", "Incorreto. É uma interjeição de surpresa/emoção."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Assinale a frase correta quanto à regência do verbo 'Informar':",
+            options: ["Informei o gerente sobre o erro.", "Informei ao gerente do erro.", "Informei o gerente o erro.", "Informei o erro ao gerente."],
+            correct: 3,
+            explanation: {
+                correct: "Informar possui dupla regência: Informar ALGO a ALGUÉM (o erro ao gerente) OU Informar ALGUÉM de ALGO (o gerente sobre o erro).",
+                options: ["Correta, mas a alternativa D é a forma clássica pedida em exames. (A está aceitável, mas D é o modelo preferido).", "Erro: duplo objeto indireto (ao / do).", "Erro: duplo objeto direto (o / o).", "Certa. (Modelo perfeito: OD da coisa, OI da pessoa)."]
+            }
+        },
+        {
+            id: 21, level: "Difícil",
+            text: "A crase antes da palavra 'casa' tem uma regra ardilosa. Assinale a frase CORRETA:",
+            options: ["Voltei à casa rapidamente.", "Irei a casa dos meus avós.", "Chegamos à casa de praia exaustos.", "Fui à casa buscar os documentos."],
+            correct: 2,
+            explanation: {
+                correct: "A palavra 'casa' (sentido de lar) só admite crase se estiver ESPECIFICADA (ex: casa de praia, casa dos avós). Sem especificação, não tem crase.",
+                options: ["Erro. 'Casa' não está especificada, portanto não aceita artigo feminino.", "Erro. Como 'casa' está especificada (dos avós), a crase era OBRIGATÓRIA.", "Certa.", "Erro. A palavra 'casa' aqui não tem nenhum determinante/especificador."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "A mesma regra da palavra 'casa' se aplica à palavra 'terra' (oposto de bordo). Identifique o erro grave:",
+            options: ["Os marinheiros voltaram a terra.", "Os astronautas voltaram à Terra.", "O navio chegou à terra dos canibais.", "Os piratas desceram à terra."],
+            correct: 3,
+            explanation: {
+                correct: "A palavra 'terra' só aceita crase se for o planeta (com maiúscula) ou se estiver especificada. 'Descer a terra' (sem especificar) não leva crase.",
+                options: ["Correto. 'Terra' (chão) não está especificada, não leva crase.", "Correto. Trata-se do Planeta Terra, que admite o artigo 'a'.", "Correto. 'Terra' está especificada ('dos canibais'), logo leva crase.", "Certa (esta é a frase que contém o erro solicitado na questão)."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "Leia: 'A reunião ocorrerá das 14h ___ 16h, e na terça, de 8h ___ 10h.' Preencha as lacunas respeitando o paralelismo:",
+            options: ["às / as", "as / às", "às / a", "às / às"],
+            correct: 0,
+            explanation: {
+                correct: "Paralelismo: Se usou DE (só preposição), use A (só preposição). Se usou DA/DAS (preposição + artigo), use À/ÀS (crase).",
+                options: ["Certa. Das 14h às 16h (DAS pede ÀS). De 8h a 10h (DE pede A, no plural AS por causa de 10h sem artigo). *Correção estrita: DE 8h a 10h.", "Totalmente inverso ao paralelismo.", "Falta concordância de número no segundo termo.", "Quebrou o paralelismo da segunda parte (De... às está errado)."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "Sobre os pronomes relativos, em qual caso a crase é obrigatória?",
+            options: ["A moça a quem me referi chegou.", "Esta é a regra à qual devemos obedecer.", "A aluna a cujo pai entreguei a nota saiu.", "O livro a que fiz referência sumiu."],
+            correct: 1,
+            explanation: {
+                correct: "O pronome relativo 'qual/quais' aceita artigo. Como o verbo 'obedecer' pede a preposição 'a', junta-se 'a' + 'a qual' = à qual.",
+                options: ["Incorreto. Não se usa crase antes de 'quem'.", "Certa.", "Incorreto. Não se usa crase antes de 'cujo'.", "Incorreto. Não se usa crase antes do 'que' puro."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "O uso da crase em instrumentos (escrever a caneta, matar a facadas) gera debates. Qual o consenso das bancas de exame?",
+            options: ["A crase é sempre obrigatória.", "A crase é estritamente proibida.", "Usa-se a crase apenas para evitar ambiguidade.", "A crase depende do tamanho do instrumento."],
+            correct: 2,
+            explanation: {
+                correct: "Bancas exigem crase em adjuntos adverbiais de instrumento apenas para evitar duplo sentido (ex: 'lavar à mão' vs 'lavar a mão').",
+                options: ["Mentira. Só se exige para sanar ambiguidades.", "Mentira. Ela é aplicada em casos específicos de ambiguidade.", "Certa.", "Absurdo sem base gramatical."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Analise a regência dos verbos LEMBRAR e ESQUECER. Qual frase está ERRADA?",
+            options: ["Esqueci o meu material.", "Lembrei-me do meu material.", "Esqueci-me do meu material.", "Lembrei do meu material."],
+            correct: 3,
+            explanation: {
+                correct: "Regra: Se tem pronome (me, te, se), tem preposição (de). Se não tem pronome, não tem preposição. 'Lembrei do' mistura as duas regras.",
+                options: ["Correto. Sem pronome, sem preposição.", "Correto. Com pronome 'me', com preposição 'de'.", "Correto. Idem acima.", "Certa (esta é a errada). Faltou o pronome (Lembrei-me do) ou sobrou preposição (Lembrei o)."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "O candidato almeja ___ vaga de emprego, e isso implica ___ abdicar de finais de semana.",
+            options: ["à / em", "a / em", "a / --", "à / --"],
+            correct: 2,
+            explanation: {
+                correct: "O verbo 'almejar' é Transitivo Direto (não tem crase: almeja a vaga). 'Implicar' no sentido de acarretar também é TD (não tem 'em').",
+                options: ["Errou as duas regências (colocou crase onde não há preposição, e colocou preposição onde não existe).", "Errou a regência de implicar (adicionou o 'em').", "Certa.", "Errou a regência de almejar (adicionou crase indevida)."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "Assinale a opção em que a omissão do acento grave (crase) altera PROFUNDAMENTE o sentido da frase:",
+            options: ["Ele foi até a porta.", "Bateu a porta com força.", "Saiu a noite pela rua.", "Vendeu a prazo."],
+            correct: 1,
+            explanation: {
+                correct: "'Bateu a porta' = fechar a porta com violência. 'Bateu à porta' = dar batidas (toc toc) na porta. A crase muda a semântica.",
+                options: ["Após 'até', a crase é facultativa, não muda o sentido.", "Certa.", "Erro crasso ortográfico. Tem que ter crase sempre ('à noite'), mas o foco da questão é a mudança de sentido literário.", "Expressão impossível de levar crase (prazo é masculino)."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "Observe: 'Pintou o quadro ___ óleo e escreveu o poema ___ Machado de Assis'. As lacunas recebem:",
+            options: ["a / a", "à / a", "a / à", "à / à"],
+            correct: 2,
+            explanation: {
+                correct: "'Óleo' é masculino (sem crase). Em 'Machado de Assis', a crase ocorre pois está implícita a locução 'à moda de', mesmo sendo nome masculino.",
+                options: ["Errou a segunda. Existe a locução 'à moda de' escondida.", "Errou as duas. Óleo não leva crase.", "Certa.", "Óleo é palavra masculina, não aceita crase."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "Para fechar o diagnóstico: 'A candidata chegou ___ etapa final de testes disposta ___ provar seu valor ___ banca examinadora.'",
+            options: ["a / a / a", "à / à / à", "à / a / à", "a / à / à"],
+            correct: 2,
+            explanation: {
+                correct: "Chegou A+A etapa (= à). Disposta A provar (antes de verbo não tem crase). Provar algo A+A banca (= à).",
+                options: ["Errou as crases de 'etapa' e 'banca'.", "Errou ao colocar crase antes do verbo 'provar'.", "Certa.", "Errou a primeira, esquecendo a crase em 'etapa'."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `
+<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>
+`
+        }).join('')}
+</div>
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '✅ Raciocínio Aprovado!' : '❌ Ops! Falha Detectada:'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>
+`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐" : percent >= 60 ? "⭐⭐" : "⭐";
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += '<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);"><strong>⚠️ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>';
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()">Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += '<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);"><strong>🏆 Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>';
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()">Refazer Prova (Zerar Histórico)</button>';
+        }
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

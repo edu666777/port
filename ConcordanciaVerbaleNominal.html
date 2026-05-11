@@ -1,10 +1,734 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concordância - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema: Violeta e Laranja (Foco e Criatividade) */
+            --bg-color: #F5F3FF;
+            --text-color: #1E1B4B;
+            --border-color: #000000;
+            --white: #FFFFFF;
+            --theme-light: #DDD6FE;
+            --theme-medium: #8B5CF6;
+            --theme-dark: #4C1D95;
+            --theme-contrast: #F97316;
+            --theme-accent: #6D28D9;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center; flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px; border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #E0F2FE; border-left: 4px solid var(--theme-contrast); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #075985; }
+        .highlight-box.warning { background-color: #FEF2F2; border-left-color: #BE123C; color: #881337; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--theme-dark); background: white; cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-dark); color: white; box-shadow: 2px 2px 0px var(--theme-contrast); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">🧠</span> PROMOVER</div>
+        <h1>LÍNGUA PORTUGUESA / 6º AO 9º ANO</h1>
+        <p class="subtitle">CONCORDÂNCIA VERBAL E NOMINAL</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')"> Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')"> Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar conceito...">
+        </div>
+        <div id="no-results"><p> Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">Regra 1: Concordância Verbal Básica</span>
+            <div class="theory-box">
+                <h3>🗣️ Sujeito e Verbo de Mãos Dadas</h3>
+                <p>A regra de ouro: O verbo SEMPRE se adapta ao sujeito da frase em <strong>número</strong> (singular/plural) e <strong>pessoa</strong> (1ª, 2ª ou 3ª).</p>
+                <div class="visual-area">
+                    "A menina <strong>estuda</strong>."<br>
+                    "As meninas <strong>estudam</strong>."
+                </div>
+                <div class="highlight-box">
+                    Se o sujeito for composto (mais de um núcleo), o verbo vai para o plural: "João e Maria <strong>foram</strong> ao parque."
+                </div>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">Regra 2: Concordância Nominal Básica</span>
+            <div class="theory-box">
+                <h3>👗 O Substantivo é o Chefe</h3>
+                <p>Artigos, adjetivos, numerais e pronomes devem concordar em <strong>gênero</strong> (masculino/feminino) e <strong>número</strong> (singular/plural) com o substantivo que acompanham.</p>
+                <div class="visual-area">
+                    "O<strong>s</strong> noss<strong>os</strong> doi<strong>s</strong> lind<strong>os</strong> cachorros."
+                </div>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">Regra 3: Verbos Impessoais (Haver e Fazer)</span>
+            <div class="theory-box">
+                <h3>⚠️ Eles Não Têm Sujeito!</h3>
+                <p>O verbo <strong>HAVER</strong> (no sentido de existir ou tempo passado) e o verbo <strong>FAZER</strong> (indicando tempo decorrido ou clima) ficam <strong>SEMPRE NO SINGULAR</strong>.</p>
+                <div class="visual-area">
+                    "<strong>Há</strong> muitos alunos aqui."<br>
+                    "<strong>Faz</strong> dois anos que estudo."
+                </div>
+                <div class="highlight-box warning">
+                    <strong>Erro comum:</strong> Dizer "Fazem dois anos" ou "Houveram acidentes" é um erro gravíssimo! O certo é "Faz dois anos" e "Houve acidentes".
+                </div>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">Regra 4: Expressões Traiçoeiras</span>
+            <div class="theory-box">
+                <h3>🕵️‍♂️ Meio, Anexo, Obrigado</h3>
+                <p>Algumas palavras mudam de regra dependendo do que significam:</p>
+                <ul style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                    <li><strong>Anexo / Obrigado / Mesmo:</strong> Concordam com a pessoa/coisa. (Ex: A foto vai <em>anexa</em> / Ela disse <em>obrigada</em>).</li>
+                    <li><strong>Meio (Metade):</strong> Concorda. (Ex: Comi <em>meia</em> maçã).</li>
+                    <li><strong>Meio (Um pouco/Advérbio):</strong> Invariável. NUNCA diga "meia cansada". (Ex: Ela está <em>meio</em> cansada).</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">
+            Iniciar Diagnóstico (30 Q) →
+        </button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">
+                30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!
+            </p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+
+</div>
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    const questions = [
+// FÁCEIS (10)
+        {
+            id: 1, level: "Fácil",
+            text: "Qual frase apresenta a concordância verbal CORRETA?",
+            options: ["Nós vai ao cinema hoje.", "Os aluno estudaram para a prova.", "Eu e meu irmão fomos ao parque.", "A menina brincam na rua."],
+            correct: 2,
+            explanation: {
+                correct: "O sujeito é composto ('Eu e meu irmão', equivale a 'nós'), logo o verbo deve estar no plural 'fomos'.",
+                options: ["'Nós' exige 'vamos'.", "Faltou o 's' em 'alunos' (concordância nominal errada) e o sujeito deve guiar o verbo.", "A resposta correta é a C.", "O sujeito está no singular, o verbo deveria ser 'brinca'."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Preencha a lacuna: 'Os cadernos e as canetas são __________.'",
+            options: ["novo", "novos", "novas", "nova"],
+            correct: 1,
+            explanation: {
+                correct: "Substantivos de gêneros diferentes (cadernos/canetas) levam o adjetivo para o plural masculino (novos).",
+                options: ["Deve ir para o plural.", "A resposta correta é a B.", "O masculino prevalece quando há gêneros diferentes.", "Deve ir para o plural."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Marque a opção correta para a fala de uma mulher ao agradecer:",
+            options: ["Muito obrigado, disse ela.", "Muito obrigados, disse ela.", "Muito obrigada, disse ela.", "Muito obrigadas, disse ela."],
+            correct: 2,
+            explanation: {
+                correct: "'Obrigado' é um adjetivo e deve concordar em gênero com quem fala. Se é mulher, 'obrigada'.",
+                options: ["Mulher diz 'obrigada'.", "Não faz sentido o plural aqui.", "A resposta correta é a C.", "Só usaria o plural se estivesse agradecendo em nome de várias mulheres ('nós estamos obrigadas')."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Na frase 'Comprei frutas e legumes...', se quisermos usar o adjetivo 'maduro', como fica?",
+            options: ["maduros", "maduras", "maduro", "madura"],
+            correct: 0,
+            explanation: {
+                correct: "Frutas (fem) e legumes (masc). A regra geral manda o adjetivo para o masculino plural quando os gêneros se misturam.",
+                options: ["A resposta correta é a A.", "Masculino prevalece na concordância de gêneros diferentes.", "Tem que ir para o plural, pois são dois substantivos.", "Plural é obrigatório."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "Complete: 'A multidão ___________ rapidamente após o show.'",
+            options: ["se dispersaram", "dispersaram-se", "se dispersou", "dispersarão"],
+            correct: 2,
+            explanation: {
+                correct: "'Multidão' é um substantivo coletivo no singular. Portanto, o verbo fica no singular.",
+                options: ["O sujeito está no singular, o verbo não pode ir pro plural.", "Idem ao erro A.", "A resposta correta é a C.", "Tempo verbal errado e no plural."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "Como se diz corretamente que alguém está 'um pouco' cansada?",
+            options: ["Ela está meia cansada.", "Ela está meio cansada.", "Ela está meias cansada.", "Ela está menas cansada."],
+            correct: 1,
+            explanation: {
+                correct: "'Meio' com sentido de 'um pouco' é advérbio e advérbio é palavra invariável, não flexiona.",
+                options: ["'Meia' só serve para metades (meia pizza) ou o que se calça.", "A resposta correta é a B.", "Não existe essa flexão adverbial.", "'Menas' não existe na língua portuguesa."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Qual a forma correta do verbo na frase: 'Fui eu que _________ a janela'?",
+            options: ["quebrou", "quebramos", "quebrei", "quebraram"],
+            correct: 2,
+            explanation: {
+                correct: "Quando o pronome 'que' retoma o sujeito ('eu'), o verbo concorda com o antecedente ('eu quebrei').",
+                options: ["Seria 'quebrou' se usasse o pronome 'quem' (Fui eu quem quebrou).", "Não concorda com 'nós'.", "A resposta correta é a C.", "Totalmente sem concordância."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "Complete a frase corretamente: 'Eles ________ as fotos para o mural.'",
+            options: ["trouxe", "trazemos", "trouxeram", "trás"],
+            correct: 2,
+            explanation: {
+                correct: "O pronome 'Eles' está na 3ª pessoa do plural, exigindo o verbo no plural 'trouxeram'.",
+                options: ["'Trouxe' é 1ª ou 3ª do singular.", "Não é 'nós'.", "A resposta correta é a C.", "'Trás' é advérbio de lugar, não o verbo trazer (traz)."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "Preencha: 'É __________ a entrada de animais no hospital.'",
+            options: ["proibido", "proibida", "proibidos", "proibidas"],
+            correct: 1,
+            explanation: {
+                correct: "A palavra 'entrada' está determinada pelo artigo 'a'. Portanto, a expressão concorda com ela: 'É proibida'.",
+                options: ["Seria 'proibido' se não tivesse o artigo: 'É proibido entrada'.", "A resposta correta é a B.", "O sujeito é singular.", "O sujeito é singular."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "Marque a frase com ERRO de concordância nominal.",
+            options: ["Vieram bastantes pessoas à festa.", "A porta estava meio aberta.", "Comprei menas maçãs hoje.", "As próprias alunas resolveram o problema."],
+            correct: 2,
+            explanation: {
+                correct: "A palavra 'menas' não existe. O correto é sempre 'menos', pois é advérbio invariável.",
+                options: ["Correto. 'Bastantes' aqui significa 'muitas'.", "Correto. 'Meio' = 'um pouco'.", "A resposta correta é a C (contém o erro).", "Correto. 'Próprias' concorda com alunas."]
+            }
+        },
+
+// MÉDIAS (10)
+        {
+            id: 11, level: "Médio",
+            text: "Assinale a opção em que a concordância do verbo FAZER está correta:",
+            options: ["Fazem três anos que não viajo.", "Faziam dois meses que ela sumiu.", "Fazia três semanas que chovia.", "Vão fazer cinco dias de calor."],
+            correct: 2,
+            explanation: {
+                correct: "Verbo fazer indicando tempo transcorrido é impessoal (singular). 'Fazia' está perfeito.",
+                options: ["Erro grosseiro. Deve ser 'Faz três anos'.", "Deve ser 'Fazia dois meses'.", "A resposta correta é a C.", "O auxiliar também fica no singular: 'Vai fazer'."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "Qual destas frases usa o verbo HAVER de forma gramaticalmente exata?",
+            options: ["Houveram grandes festas na cidade.", "Haviam muitas pessoas na fila do banco.", "Deve haver soluções para este problema.", "Devem haver soluções para este problema."],
+            correct: 2,
+            explanation: {
+                correct: "Haver (existir) é impessoal. Ele transfere a impessoalidade para o auxiliar ('Deve haver').",
+                options: ["'Houve' grandes festas.", "Apenas 'Havia' muitas pessoas.", "A resposta correta é a C.", "O verbo auxiliar ('Devem') não pode ir para o plural acompanhando o 'Haver' impessoal."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "Complete a frase: 'Seguem _________ os documentos solicitados pela direção.'",
+            options: ["anexo", "em anexo", "anexos", "anexas"],
+            correct: 2,
+            explanation: {
+                correct: "'Anexo' é adjetivo e concorda com o substantivo a que se refere ('os documentos' -> 'anexos').",
+                options: ["Falta concordância de número.", "'Em anexo' é invariável, mas 'anexos' encaixa perfeitamente como adjetivo direto.", "A resposta correta é a C.", "O substantivo é masculino (documentos)."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "Na oração: 'A maioria dos alunos ________ na prova', qual é a concordância aceita?",
+            options: ["Só pode ser 'passou'.", "Só pode ser 'passaram'.", "Pode ser 'passou' ou 'passaram'.", "O verbo deve ficar no infinitivo 'passar'."],
+            correct: 2,
+            explanation: {
+                correct: "Com sujeitos partitivos (a maioria de, grande parte de), o verbo pode concordar com o núcleo (maioria -> passou) ou com o especificador (alunos -> passaram).",
+                options: ["O plural também é aceito.", "O singular também é aceito.", "A resposta correta é a C.", "Regra inexistente."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "Selecione a opção correta para preencher: 'Fui eu quem _________ a conta.'",
+            options: ["pagou", "paguei", "pagamos", "pagaram"],
+            correct: 0,
+            explanation: {
+                correct: "Com o pronome 'quem', o verbo fica na 3ª pessoa do singular (pagou). (Também se aceita concordar com o pronome anterior 'paguei', mas 'pagou' é a regra principal).",
+                options: ["A resposta correta é a A.", "Embora algumas gramáticas aceitem 'paguei', a prova padrão prefere a 3ª pessoa para 'quem'. A opção A é a mais garantida.", "Incorreto.", "Incorreto."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Como completar a frase: 'Vossa Excelência _________ enganado, senhor Juiz.'",
+            options: ["estais", "está", "estão", "estamos"],
+            correct: 1,
+            explanation: {
+                correct: "Pronomes de tratamento (Vossa Excelência, Vossa Senhoria) exigem o verbo sempre na 3ª pessoa (singular ou plural, dependendo do pronome).",
+                options: ["Não se usa 2ª pessoa (vós) com pronome de tratamento.", "A resposta correta é a B.", "É apenas um juiz, singular.", "Não tem sentido de 'nós'."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "Em 'Haja visto a situação...', a expressão está usada corretamente?",
+            options: ["Sim, a expressão é invariável.", "Não, o correto é sempre 'Haja vista'.", "Não, o correto é 'Hajam vistos'.", "Sim, concorda com o verbo haver."],
+            correct: 1,
+            explanation: {
+                correct: "A expressão 'haja vista' é invariável. Não se flexiona o particípio para 'visto' nem para 'vistos'.",
+                options: ["Está errada na frase.", "A resposta correta é a B.", "Forma bizarra e incorreta.", "Não existe essa concordância."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "Identifique a concordância correta com a palavra BASTANTE:",
+            options: ["Eles comeram bastantes doces na festa.", "Eles estavam bastantes cansados.", "Havia bastante pessoas no local.", "Conversamos bastantes sobre isso."],
+            correct: 0,
+            explanation: {
+                correct: "Quando 'bastante' significa 'muitos(as)' e acompanha um substantivo, ele varia (bastantes doces).",
+                options: ["A resposta correta é a A.", "Aqui é advérbio ('muito' cansados), não varia.", "Aqui acompanha substantivo plural, deveria ser 'bastantes pessoas'.", "Aqui é advérbio modificando o verbo, não varia."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "Complete: '________ dez horas no relógio da praça.'",
+            options: ["Bateu", "Bateram", "Bate", "Batemos"],
+            correct: 1,
+            explanation: {
+                correct: "Verbos 'bater', 'dar' e 'soar' referentes a horas concordam com o numeral (Bateram dez horas).",
+                options: ["Só seria 'bateu' se o relógio fosse o sujeito ('O relógio bateu dez horas').", "A resposta correta é a B.", "Singular incorreto para 'dez horas'.", "Sujeito não é 'nós'."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Qual é a forma correta da voz passiva sintética?",
+            options: ["Vende-se apartamentos antigos.", "Aluga-se casas na praia.", "Consertam-se relógios importados.", "Procura-se trabalhadores."],
+            correct: 2,
+            explanation: {
+                correct: "Na voz passiva ('se' é pronome apassivador), o verbo concorda com o sujeito paciente ('relógios são consertados' -> 'consertam-se relógios').",
+                options: ["Erro: Vendem-se apartamentos.", "Erro: Alugam-se casas.", "A resposta correta é a C.", "Erro: Procuram-se trabalhadores."]
+            }
+        },
+
+// DIFÍCEIS (10)
+        {
+            id: 21, level: "Difícil",
+            text: "O uso da partícula 'SE' gera índice de indeterminação do sujeito (logo, verbo no singular) em qual frase?",
+            options: ["Compraram-se novos computadores.", "Precisa-se de novos professores.", "Construiu-se uma ponte.", "Ouviram-se gritos estranhos."],
+            correct: 1,
+            explanation: {
+                correct: "Quando o verbo é Transitivo Indireto (Precisa DE), não há voz passiva. O 'se' indetermina o sujeito, forçando o verbo a ficar no singular.",
+                options: ["Verbo Transitivo Direto, 'computadores' é o sujeito (passiva).", "A resposta correta é a B.", "Passiva sintética (A ponte foi construída).", "Passiva sintética (Gritos foram ouvidos)."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "Qual das frases está TOTALMENTE alinhada à norma-padrão?",
+            options: ["Faziam anos que não ocorriam chuvas assim.", "Pode haver muitos problemas se você atrasar.", "Podem haverem muitos problemas se você atrasar.", "Houveram sérios imprevistos na reunião."],
+            correct: 1,
+            explanation: {
+                correct: "'Haver' como existir é impessoal. A locução 'Pode haver' mantém o auxiliar no singular, estando correta.",
+                options: ["'Faz' anos (impessoal).", "A resposta correta é a B.", "Duplo erro de impessoalidade.", "'Houve' sérios imprevistos."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "Concordância com o sujeito infinitivo: 'É ________ a cautela nestes casos.'",
+            options: ["necessário", "necessária", "necessários", "necessárias"],
+            correct: 1,
+            explanation: {
+                correct: "Como 'cautela' está antecedida do artigo 'a', o predicativo DEVE concordar com ela ('necessária').",
+                options: ["Seria 'necessário' se não houvesse o artigo: 'É necessário cautela'.", "A resposta correta é a B.", "Plural errado.", "Plural errado."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "Qual das concordâncias com a palavra SÓ (sozinho) ou (apenas) está INCORRETA?",
+            options: ["Eles ficaram sós na sala.", "Só eles sabem a verdade.", "Eles só querem brincar.", "Eles caminhavam só pelas ruas escuras."],
+            correct: 3,
+            explanation: {
+                correct: "Se 'só' significar 'sozinhos', deve ir para o plural. O correto seria 'Eles caminhavam sós'.",
+                options: ["Correto. Sós = sozinhos.", "Correto. Só = apenas.", "Correto. Só = apenas.", "A resposta correta é a D (contém o erro)."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "Em nomes de obras no plural, como fica o verbo? Ex: 'Os Sertões _________ um clássico.'",
+            options: ["é", "são", "foi", "serão"],
+            correct: 1,
+            explanation: {
+                correct: "Se o título vem precedido de artigo no plural ('Os'), o verbo obrigatoriamente vai para o plural.",
+                options: ["Seria 'é' se fosse 'Memórias Póstumas (sem artigo) é um livro...'", "A resposta correta é a B.", "Falta concordância.", "Tempo verbal desconexo da afirmação atemporal."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Complete: 'Qual de nós ________ o problema?'",
+            options: ["resolveremos", "resolverá", "resolverão", "resolvi"],
+            correct: 1,
+            explanation: {
+                correct: "Quando o pronome interrogativo ('Qual', 'Quem') está no singular, o verbo fica na 3ª pessoa do singular.",
+                options: ["Seria 'quais de nós' para permitir 'resolveremos'.", "A resposta correta é a B.", "Incorreto.", "Incorreto."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "Selecione a opção que apresenta um erro de atração (silépse de número):",
+            options: ["A gente somos muito unidos.", "A multidão gritava muito.", "A turma organizou a festa.", "O casal chegou tarde."],
+            correct: 0,
+            explanation: {
+                correct: "'A gente' é locução pronominal de 3ª pessoa do singular. A concordância ideológica (silépse) 'somos' é erro gramatical em provas formais.",
+                options: ["A resposta correta é a A (contém o erro).", "Concordância gramatical estrita correta.", "Correto.", "Correto."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "Como concordar adjetivo com substantivos de sentidos opostos ou sinônimos? 'Tinha amor e ódio ________'.",
+            options: ["eternos", "eterno", "eterna", "eternas"],
+            correct: 0,
+            explanation: {
+                correct: "O adjetivo posposto a substantivos de gêneros diferentes vai para o masculino plural (eternos) ou concorda com o mais próximo (eterno). Mas 'eternos' abrange ambos.",
+                options: ["A resposta correta é a A.", "Também estaria certo por proximidade, mas a A é a regra geral de soma.", "Não concorda com amor.", "Gêneros mistos não geram feminino plural."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "Sobre o verbo SER indicando distâncias, dias e horas. Qual é a errada?",
+            options: ["Hoje é dia 15 de maio.", "Hoje são 15 de maio.", "Daqui até lá é dois quilômetros.", "É uma hora da tarde."],
+            correct: 2,
+            explanation: {
+                correct: "O verbo 'ser' na indicação de distância concorda com o numeral. O certo é: 'Daqui até lá SÃO dois quilômetros'.",
+                options: ["Correto (concorda com a palavra 'dia').", "Correto (concorda com o número '15').", "A resposta correta é a C (contém o erro).", "Correto (concorda com 'uma')."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "Na expressão 'É proibido entrada', por que 'proibido' está no masculino?",
+            options: ["Porque não há artigo determinante (a) antes de entrada.", "Porque a palavra entrada é masculina.", "Porque o verbo ser obriga o masculino.", "Por um erro gramatical consagrado pelo uso."],
+            correct: 0,
+            explanation: {
+                correct: "Sem artigo, a expressão 'é proibido/bom/necessário' fica invariável no masculino.",
+                options: ["A resposta correta é a A.", "'Entrada' é substantivo feminino.", "A regra é a ausência de determinantes.", "Não é erro, é norma culta."]
+            }
+        }
+    ];
+
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada:'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#10B981', '#059669', '#34D399', '#047857'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct/questions.length) * 100);
+        if (window.confetti) confetti.reset();
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "⭐⭐⭐" : percent >= 60 ? "⭐⭐" : "⭐";
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += '<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);"><strong>⚠️ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>';
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += '<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);"><strong>🏆 Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>';
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span></div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

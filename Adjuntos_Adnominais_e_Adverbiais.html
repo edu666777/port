@@ -1,10 +1,722 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adjuntos - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema: Adjuntos - Roxo (O Nome/Adnominal) e Laranja (A Circunstância/Adverbial) */
+            --bg-color: #FAF5FF;
+            --text-color: #0F172A;
+            --border-color: #4C1D95;
+            --white: #FFFFFF;
+            --theme-light: #E9D5FF;
+            --theme-medium: #A855F7;
+            --theme-dark: #6B21A8;
+            --theme-contrast: #EA580C;
+            --theme-accent: #FDBA74;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #F3E8FF; border-left: 4px solid var(--theme-dark); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #4C1D95; }
+        .highlight-box.warning { background-color: #FFF7ED; border-left-color: #EA580C; color: #9A3412; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--white); background: var(--theme-dark); cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-contrast); color: var(--white); box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">🧩</span> PROMOVER</div>
+        <h1>Língua Portuguesa | IFCE</h1>
+        <p class="subtitle">Adjuntos Adnominais e Adverbiais</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conceito" placeholder="Pesquisar adjunto...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">1. O Adjunto Adnominal</span>
+            <div class="theory-box">
+                <h3>A Sombra do Substantivo</h3>
+                <p>O Adjunto Adnominal é o termo que orbita, caracteriza e determina um <strong>substantivo</strong>. Ele vem "junto" (ad) do "nome" (nominal).</p>
+                <div class="highlight-box">
+                    <strong>Quem pode ser?</strong><br>
+                    Artigos (<em>O</em> menino), Adjetivos (Carro <em>novo</em>), Numerais (<em>Dois</em> gatos) e Pronomes Adjetivos (<em>Meu</em> livro).
+                </div>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">2. O Adjunto Adverbial</span>
+            <div class="theory-box">
+                <h3>O Cenário da Ação</h3>
+                <p>O Adjunto Adverbial é o termo que modifica um <strong>verbo</strong>, um <strong>adjetivo</strong> ou outro <strong>advérbio</strong>, indicando uma circunstância (tempo, lugar, modo, causa, etc.).</p>
+                <div class="highlight-box">
+                    <strong>Dica:</strong> Se a palavra ou expressão responder a perguntas como "Quando?", "Onde?", "Como?" ou "Por quê?", trata-se de um adjunto adverbial. Ex: Ele chegou <em>ontem</em> (Tempo).
+                </div>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">3. A Grande Pegadinha (IFCE)</span>
+            <div class="theory-box">
+                <h3>Adjunto Adnominal x Complemento Nominal</h3>
+                <p>Termos preposicionados geram confusão. Como diferenciar?<br>
+                    - <strong>Adjunto Adnominal:</strong> Tem sentido <strong>ATIVO</strong> (posse/agente). Ex: A invenção <em>de Thomas Edison</em> (Ele inventou).<br>
+                    - <strong>Complemento Nominal:</strong> Tem sentido <strong>PASSIVO</strong> (alvo da ação) e sempre completa nome abstrato. Ex: A invenção <em>da lâmpada</em> (A lâmpada foi inventada).</p>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Iniciar Diagnóstico (30 Q) →</button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!</p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE DADOS - 30 QUESTÕES
+    const questions = [
+// FÁCEIS (1-10)
+        {
+            id: 1, level: "Fácil",
+            text: "Qual é a função básica do Adjunto Adnominal em uma oração?",
+            options: ["Modificar o verbo indicando tempo.", "Modificar um adjetivo.", "Acompanhar, determinar ou caracterizar um substantivo (o nome).", "Ligar duas orações diferentes."],
+            correct: 2,
+            explanation: {
+                correct: "A palavra 'adnominal' significa 'junto ao nome'. A função deste adjunto é orbitar o substantivo, dando-lhe características ou definindo-o.",
+                options: ["Função de adjunto adverbial.", "Função de adjunto adverbial.", "A resposta certa é a C.", "Função de conjunção."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Na frase 'O CARRO VERMELHO quebrou', quais palavras atuam como adjuntos adnominais do núcleo do sujeito 'carro'?",
+            options: ["O / quebrou", "O / vermelho", "Vermelho / quebrou", "Carro / vermelho"],
+            correct: 1,
+            explanation: {
+                correct: "O artigo 'O' e o adjetivo 'vermelho' estão modificando e acompanhando diretamente o substantivo núcleo 'carro'.",
+                options: ["'Quebrou' é o verbo (núcleo do predicado).", "A resposta certa é a B.", "'Quebrou' é verbo.", "'Carro' é o próprio núcleo."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "A principal função sintática desempenhada por um advérbio em uma oração é a de:",
+            options: ["Objeto Direto", "Sujeito Simples", "Adjunto Adverbial", "Complemento Nominal"],
+            correct: 2,
+            explanation: {
+                correct: "Morfologicamente chamamos de advérbio; na análise sintática (função na frase), ele é o adjunto adverbial.",
+                options: ["Função de substantivo/pronome.", "Função de substantivo/pronome.", "A resposta certa é a C.", "Função de termo regido por preposição completando nome abstrato."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Identifique o Adjunto Adverbial de LUGAR na frase: 'Nós deixamos os livros NA ESCOLA'.",
+            options: ["Nós", "Deixamos", "Os livros", "Na escola"],
+            correct: 3,
+            explanation: {
+                correct: "'Na escola' (preposição em + artigo a + substantivo) forma uma locução adverbial que indica onde a ação ocorreu.",
+                options: ["Sujeito.", "Verbo transitivo direto.", "Objeto direto.", "A resposta certa é a D."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "Em 'Aquelas DUAS meninas saíram', a palavra destacada é morfologicamente um numeral. Na sintaxe, ela funciona como:",
+            options: ["Núcleo do Sujeito", "Adjunto Adverbial", "Adjunto Adnominal", "Objeto Direto"],
+            correct: 2,
+            explanation: {
+                correct: "Numerais que acompanham e quantificam um substantivo (meninas) exercem a função de adjunto adnominal.",
+                options: ["O núcleo é 'meninas'.", "Não modifica verbo.", "A resposta certa é a C.", "Não é complemento verbal aqui."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "Leia: 'Choveu MUITO ONTEM'. Temos nessa oração, respectivamente, adjuntos adverbiais de:",
+            options: ["Modo e Lugar", "Intensidade e Tempo", "Causa e Intensidade", "Tempo e Modo"],
+            correct: 1,
+            explanation: {
+                correct: "'Muito' intensifica a ação de chover (Intensidade); 'ontem' situa a ação cronologicamente (Tempo).",
+                options: ["Não há lugar.", "A resposta certa é a B.", "Não há causa explícita.", "Está invertido e errado no modo."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "O Adjunto Adverbial pode modificar o sentido de três elementos na oração. Quais são eles?",
+            options: ["Substantivo, artigo e pronome.", "Verbo, adjetivo e outro advérbio.", "Verbo, sujeito e objeto.", "Conjunção, preposição e interjeição."],
+            correct: 1,
+            explanation: {
+                correct: "O adjunto adverbial (assim como o advérbio) orbita o Verbo (correu muito), o Adjetivo (muito rápido) ou o próprio Advérbio (muito bem).",
+                options: ["Não modifica a esfera nominal.", "A resposta certa é a B.", "Não modifica o sujeito diretamente.", "Não modifica relatores relacionais."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "Na frase 'AS MINHAS chaves sumiram', as palavras em destaque funcionam como:",
+            options: ["Núcleos do Sujeito", "Adjuntos Adnominais", "Predicativos do Sujeito", "Adjuntos Adverbiais"],
+            correct: 1,
+            explanation: {
+                correct: "O artigo 'As' e o pronome possessivo 'minhas' estão juntos do nome 'chaves', determinando-o.",
+                options: ["O núcleo é 'chaves'.", "A resposta certa é a B.", "Não são atributos ligados por verbo.", "Não modificam verbo."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "Identifique o Adjunto Adverbial de MODO na oração: 'Ele abriu a porta CUIDADOSAMENTE'.",
+            options: ["Ele", "Abriu", "A porta", "Cuidadosamente"],
+            correct: 3,
+            explanation: {
+                correct: "'Cuidadosamente' expressa a maneira (o modo) como a ação de abrir a porta foi executada.",
+                options: ["Sujeito.", "Verbo.", "Objeto direto.", "A resposta certa é a D."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "Em 'Vendi o carro DO MEU PAI', a expressão preposicionada 'do meu pai' indica posse e acompanha o substantivo 'carro'. Ela é um:",
+            options: ["Adjunto Adverbial", "Objeto Indireto", "Adjunto Adnominal", "Predicativo do Objeto"],
+            correct: 2,
+            explanation: {
+                correct: "A locução com valor de adjetivo (posse) que caracteriza um substantivo concreto atua como adjunto adnominal.",
+                options: ["Não modifica verbo.", "O verbo 'vender' aqui não pediu 'do pai' como alvo da venda.", "A resposta certa é a C.", "Não é estado do objeto."]
+            }
+        },
+
+// MÉDIAS (11-20)
+        {
+            id: 11, level: "Médio",
+            text: "Diferencie Adjunto Adnominal de Adjunto Adverbial. Em 'O menino COM MEDO chorou', a expressão destacada é:",
+            options: ["Adjunto Adverbial de modo, pois indica como ele chorou.", "Adjunto Adnominal, pois é uma locução adjetiva (medroso) caracterizando o substantivo 'menino'.", "Objeto Indireto.", "Adjunto Adverbial de causa."],
+            correct: 1,
+            explanation: {
+                correct: "A expressão está ligada ao substantivo 'menino' (o menino medroso). Se estivesse ligada ao verbo (chorou com medo), seria adverbial.",
+                options: ["Não está modificando o verbo isoladamente.", "A resposta certa é a B.", "Não completa o verbo.", "A causa foi o medo, mas sintaticamente está adjetivando o menino."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "Leia: 'As provas foram elaboradas PELOS PROFESSORES'. O termo em destaque é o Agente da Passiva. Se fosse 'As provas DOS PROFESSORES vazaram', o termo seria:",
+            options: ["Agente da Passiva.", "Adjunto Adverbial de lugar.", "Adjunto Adnominal.", "Objeto Indireto."],
+            correct: 2,
+            explanation: {
+                correct: "Na segunda frase, 'dos professores' indica posse sobre o substantivo concreto 'provas'. Todo termo com posse sobre concreto é Adjunto Adnominal.",
+                options: ["A segunda frase não está na voz passiva analítica.", "Não indica espaço.", "A resposta certa é a C.", "Não completa verbo transitivo indireto."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "No período 'O cachorro morreu DE FOME', a expressão 'de fome' atua como:",
+            options: ["Objeto Indireto", "Adjunto Adnominal", "Complemento Nominal", "Adjunto Adverbial de Causa"],
+            correct: 3,
+            explanation: {
+                correct: "A expressão indica o motivo, a razão que engatilhou a ação do verbo 'morrer'. Logo, é uma circunstância causal (advérbio).",
+                options: ["O verbo morrer é intransitivo, não pede objeto indireto.", "Não qualifica cachorro diretamente.", "Não completa nome abstrato.", "A resposta certa é a D."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "O Pronome Pessoal Oblíquo Átono pode exercer função de Adjunto Adnominal quando tem valor de posse (meu, seu, dele). Identifique essa situação:",
+            options: ["Entreguei-lhe o caderno.", "Eu o vi no parque.", "Roubaram-me a carteira.", "Não me diga isso."],
+            correct: 2,
+            explanation: {
+                correct: "'Roubaram-me a carteira' equivale a 'Roubaram a MINHA carteira'. O pronome 'me' atua com valor possessivo, sendo adjunto adnominal.",
+                options: ["'Lhe' é objeto indireto (a ele).", "'O' é objeto direto.", "A resposta certa é a C.", "'Me' é objeto indireto (a mim)."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "A pegadinha clássica: 'A invenção DO RÁDIO mudou o mundo'. O termo destacado é:",
+            options: ["Adjunto Adnominal, pois tem valor ativo (o rádio inventou).", "Complemento Nominal, pois tem valor passivo (o rádio foi inventado) e completa um substantivo abstrato.", "Adjunto Adverbial de instrumento.", "Objeto Indireto."],
+            correct: 1,
+            explanation: {
+                correct: "Se o termo sofre a ação do nome abstrato (o rádio é alvo da invenção), ele é Complemento Nominal.",
+                options: ["O rádio não é um ser que inventa coisas.", "A resposta certa é a B.", "Não modifica verbo.", "Não completa verbo."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Agora analise: 'A invenção DE MARCONI mudou o mundo'. O termo destacado é:",
+            options: ["Complemento Nominal, valor passivo.", "Adjunto Adnominal, pois tem valor ativo (Marconi é o agente que inventou).", "Sujeito da oração.", "Adjunto Adverbial de causa."],
+            correct: 1,
+            explanation: {
+                correct: "Se o termo preposicionado pratica a ação do nome abstrato (Marconi é quem faz a invenção), ele é Adjunto Adnominal.",
+                options: ["Marconi não foi inventado.", "A resposta certa é a B.", "O sujeito é 'A invenção de Marconi'.", "Não modifica verbo."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "Em 'Fui ao mercado COM MEU IRMÃO', temos um Adjunto Adverbial que indica a circunstância de:",
+            options: ["Instrumento", "Causa", "Companhia", "Meio"],
+            correct: 2,
+            explanation: {
+                correct: "A preposição 'com' seguida de uma pessoa que acompanha a ação do sujeito constitui o adjunto adverbial de companhia.",
+                options: ["Irmão não é ferramenta.", "Não é o motivo da ida.", "A resposta certa é a C.", "Não é o transporte (meio)."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "O Adjunto Adverbial pode ser uma oração inteira (Oração Subordinada Adverbial). Em 'Saímos QUANDO A CHUVA PAROU', a oração destacada tem valor de:",
+            options: ["Lugar", "Tempo", "Modo", "Condição"],
+            correct: 1,
+            explanation: {
+                correct: "A oração introduzida pela conjunção temporal 'quando' indica o momento exato em que a ação principal (saímos) ocorreu.",
+                options: ["Não responde 'onde'.", "A resposta certa é a B.", "Não responde 'como'.", "Não impõe 'se'."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "Os numerais em 'Os TRÊS PRIMEIROS colocados ganharão prêmios' funcionam sintaticamente como:",
+            options: ["Núcleos do Sujeito", "Adjuntos Adverbiais de Intensidade", "Adjuntos Adnominais", "Apostos"],
+            correct: 2,
+            explanation: {
+                correct: "Eles estão orbitando e quantificando o núcleo do sujeito 'colocados'. Logo, desempenham função adnominal.",
+                options: ["O núcleo é 'colocados'.", "Numeral não é advérbio.", "A resposta certa é a C.", "Não estão isolados explicando um termo anterior."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Qual é a classificação da expressão 'COM A TESOURA' na frase: 'Ele cortou o papel com a tesoura'?",
+            options: ["Adjunto Adverbial de Companhia.", "Objeto Indireto.", "Adjunto Adverbial de Instrumento.", "Adjunto Adnominal."],
+            correct: 2,
+            explanation: {
+                correct: "A tesoura é a ferramenta (o instrumento físico) utilizada para viabilizar a ação de cortar.",
+                options: ["A tesoura não é um ser animado acompanhante.", "O verbo cortar é VTD, não pede preposição.", "A resposta certa é a C.", "Não qualifica o papel."]
+            }
+        },
+
+// DIFÍCEIS (21-30)
+        {
+            id: 21, level: "Difícil",
+            text: "Pontuação e o Adjunto Adverbial: A regra diz que a vírgula é OBRIGATÓRIA quando o adjunto adverbial de longa extensão é deslocado para o início. Qual frase está correta?",
+            options: ["Ontem eu fui ao cinema.", "Na semana passada durante a chuva forte, nós perdemos o telhado.", "Nós perdemos o telhado na semana passada durante a chuva forte.", "Durante o jogo o juiz errou."],
+            correct: 1,
+            explanation: {
+                correct: "Adjuntos adverbiais longos (mais de 3 palavras) deslocados para o início da oração exigem vírgula obrigatória no padrão culto.",
+                options: ["Curto (facultativa).", "A resposta certa é a B.", "Ordem direta (vírgula proibida/desnecessária).", "Longo, falta vírgula."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "Qual é a diferença entre Adjunto Adnominal e Predicativo do Sujeito em 'A mulher ASSUSTADA gritou' e 'A mulher gritou ASSUSTADA'?",
+            options: ["Não há diferença sintática.", "No 1º, é um estado permanente (Adj. Adnominal); no 2º, é um estado transitório no momento da ação (Predicativo).", "No 1º é verbo, no 2º é advérbio.", "Ambos são objetos diretos."],
+            correct: 1,
+            explanation: {
+                correct: "Junto do nome, o adjetivo vira adjunto e marca a essência. Separado pelo verbo, vira predicativo e marca o estado exato durante a ação.",
+                options: ["A sintaxe muda completamente.", "A resposta certa é a B.", "Ambos são adjetivos morfologicamente.", "Adjetivos não são complementos verbais."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "Complemento Nominal vs. Adjunto Adnominal com preposição 'DE'. Lembre-se que o Complemento Nominal SÓ completa substantivo abstrato, adjetivo ou advérbio. Em 'A casa DE MADEIRA caiu', a expressão é:",
+            options: ["Complemento Nominal, pois a casa sofre a ação da madeira.", "Adjunto Adnominal, pois caracteriza um substantivo CONCRETO (casa).", "Adjunto Adverbial de Matéria.", "Objeto Indireto."],
+            correct: 1,
+            explanation: {
+                correct: "Regra de ouro: Termo preposicionado ligado a substantivo CONCRETO é, impreterivelmente, Adjunto Adnominal. Não existe complemento nominal de substantivo concreto.",
+                options: ["A casa não é nome abstrato.", "A resposta certa é a B.", "Poderia haver debate semântico, mas sintaticamente é adnominal.", "Não liga verbo."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "Na oração 'Fiquei feliz COM A SUA APROVAÇÃO', o termo destacado atua como:",
+            options: ["Adjunto Adverbial de causa.", "Adjunto Adnominal.", "Complemento Nominal.", "Objeto Indireto."],
+            correct: 2,
+            explanation: {
+                correct: "O termo preposicionado completa o sentido de um ADJETIVO ('feliz'). Tudo que completa sentido de adjetivo é Complemento Nominal.",
+                options: ["Pode indicar motivo semanticamente, mas a sintaxe normativa o classifica como complemento do adjetivo.", "Adnominal liga substantivo.", "A resposta certa é a C.", "Objeto liga verbo."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "A ambiguidade estrutural do Adjunto Adverbial. Em 'João viu a vizinha CORRENDO', quem estava correndo?",
+            options: ["Com certeza a vizinha.", "Com certeza o João.", "A frase é ambígua, pois o adjunto/predicativo pode se referir tanto ao sujeito (João) quanto ao objeto (vizinha).", "Nenhum dos dois."],
+            correct: 2,
+            explanation: {
+                correct: "Sem contexto ou reorganização estrutural ('Correndo, João viu a vizinha'), a sintaxe permite dupla interpretação, gerando um erro clássico de clareza.",
+                options: ["Pode ser o João.", "Pode ser a vizinha.", "A resposta certa é a C.", "A ação ocorreu."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Leia: 'As folhas CAÍDAS cobriam o chão' e 'As folhas foram CAÍDAS pelo vento'. Na primeira, 'caídas' é adjunto adnominal. Por que a segunda frase é estruturalmente bizarra na norma culta?",
+            options: ["O particípio 'caídas' não pode formar voz passiva com verbo intransitivo (cair) na norma padrão culta.", "Falta o adjunto adverbial de tempo.", "O vento não derruba folhas.", "A palavra folhas não tem plural."],
+            correct: 0,
+            explanation: {
+                correct: "Verbos intransitivos não aceitam voz passiva. As folhas caem, elas não 'são caídas' por alguém (salvo licença poética regional pesada).",
+                options: ["A resposta certa é a A.", "Tempo não afeta a agramaticalidade passiva.", "Fato irrelevante para a sintaxe.", "Falso."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "Qual destas locuções é inequivocamente um Adjunto Adverbial de AFIRMAÇÃO?",
+            options: ["De vez em quando.", "Por via das dúvidas.", "Com certeza.", "De forma alguma."],
+            correct: 2,
+            explanation: {
+                correct: "A expressão 'com certeza' (escrita separada) funciona com o mesmo valor sintático e semântico do advérbio 'certamente'.",
+                options: ["Tempo/Frequência.", "Dúvida/Condição.", "A resposta certa é a C.", "Negação."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "O Pronome Relativo atua como Adjunto Adnominal em qual das orações abaixo?",
+            options: ["A casa ONDE moro é velha.", "O menino QUE caiu chorou.", "O aluno CUJO pai é professor tirou dez.", "As flores QUE comprei murcharam."],
+            correct: 2,
+            explanation: {
+                correct: "O pronome 'cujo' sempre exerce a função de Adjunto Adnominal indicando posse, pois liga o termo possuído ao seu possuidor sintático.",
+                options: ["'Onde' atua como adjunto adverbial de lugar.", "'Que' atua como sujeito.", "A resposta certa é a C.", "'Que' atua como objeto direto."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "Morfologia e Sintaxe: A palavra 'MEIO' atua como Adjunto Adnominal quando é ________, e como Adjunto Adverbial quando é ________.",
+            options: ["Advérbio invariável / Numeral variável.", "Adjetivo / Substantivo.", "Numeral fracionário variável (meia maçã) / Advérbio de intensidade invariável (meio cansada).", "Sempre advérbio / Sempre adjetivo."],
+            correct: 2,
+            explanation: {
+                correct: "Se for quantia/fração (meia, meias), acompanha o nome = Adnominal. Se for intensidade (um pouco), modifica adjetivo/verbo = Adverbial.",
+                options: ["Conceito invertido.", "Morfologia incorreta.", "A resposta certa é a C.", "Falsa generalização."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "Em 'A crítica DO JORNALISTA destruiu o filme', a expressão é Adjunto Adnominal. Qual é o teste mental (macete) para provar isso?",
+            options: ["Transformar num adjetivo pátrio.", "Testar a voz ativa: 'O jornalista criticou'. Se ele pratica a ação de criticar, é Adnominal.", "Retirar a preposição e ver se rima.", "Verificar se 'jornalista' é concreto ou abstrato."],
+            correct: 1,
+            explanation: {
+                correct: "O teste da agentividade: se o termo preposicionado age (o jornalista faz a crítica), ele é adjunto adnominal ativo. Se ele sofre a ação, é complemento nominal.",
+                options: ["Não há relação pátria.", "A resposta certa é a B.", "Não há relação rítmica na sintaxe lógica.", "A palavra crítica é abstrata, a análise do agente resolve."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#6B21A8', '#A855F7', '#EA580C', '#4C1D95'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#6B21A8', '#A855F7', '#EA580C', '#4C1D95'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★★★" : percent >= 60 ? "★★★☆☆" : "★☆☆☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>⚠ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>★ Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

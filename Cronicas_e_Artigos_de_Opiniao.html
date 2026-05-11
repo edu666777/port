@@ -1,10 +1,716 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crônicas e Artigos de Opinião - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema Editorial: Tons de Cinza (Jornal) e Vermelho (Opinião/Crítica) */
+            --bg-color: #F8FAFC;
+            --text-color: #0F172A;
+            --border-color: #334155;
+            --white: #FFFFFF;
+            --theme-light: #E2E8F0;
+            --theme-medium: #94A3B8;
+            --theme-dark: #475569;
+            --theme-contrast: #DC2626;
+            --theme-accent: #CBD5E1;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #F1F5F9; border-left: 4px solid var(--theme-dark); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #0F172A; }
+        .highlight-box.warning { background-color: #FEF2F2; border-left-color: #DC2626; color: #991B1B; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--white); background: var(--theme-dark); cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-contrast); color: var(--white); box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">🗞️</span> PROMOVER</div>
+        <h1>Língua Portuguesa | IFCE</h1>
+        <p class="subtitle">Crônicas e Artigos de Opinião</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar gênero...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">1. A Crônica</span>
+            <div class="theory-box">
+                <h3>O Retrato do Cotidiano</h3>
+                <p>A crônica é um texto curto, geralmente publicado em jornais ou revistas, que parte de um <strong>fato banal do dia a dia</strong> (uma ida à padaria, um engarrafamento) para gerar uma reflexão, humor ou crítica leve. Tem linguagem mais livre e próxima do leitor.</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">2. O Artigo de Opinião</span>
+            <div class="theory-box">
+                <h3>A Defesa da Tese</h3>
+                <p>O artigo de opinião pertence à tipologia dissertativo-argumentativa. Seu objetivo é <strong>convencer</strong> o leitor sobre um tema geralmente polêmico. Exige uma tese clara, argumentos sólidos (dados, especialistas) e obedece à norma padrão da língua.</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">3. A Crônica Argumentativa</span>
+            <div class="theory-box">
+                <h3>A Armadilha do IFCE</h3>
+                <p>Cuidado com a crônica argumentativa! Ela funde os dois gêneros: começa narrando um fato rotineiro (iscas), mas no meio do texto o autor passa a defender um ponto de vista crítico sobre a sociedade de forma forte e persuasiva.</p>
+                <div class="highlight-box warning">
+                    <strong>Como diferenciar:</strong> O Artigo é formal e direto no argumento desde o título. A Crônica Argumentativa é literária, subjetiva e usa o cotidiano como "desculpa" para opinar.
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Iniciar Diagnóstico (30 Q) →</button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!</p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE DADOS - 30 QUESTÕES
+    const questions = [
+// FÁCEIS (1-10)
+        {
+            id: 1, level: "Fácil",
+            text: "Qual é a principal fonte de inspiração e o tema central de uma crônica tradicional?",
+            options: ["Avisos do governo.", "Fatos grandiosos e históricos de séculos passados.", "Fatos banais e cenas do cotidiano.", "Teorias complexas da física quântica."],
+            correct: 2,
+            explanation: {
+                correct: "A crônica se alimenta do dia a dia: uma conversa no ônibus, um café derramado, a chuva na janela.",
+                options: ["Isso é texto oficial/injuntivo.", "Isso é texto histórico/épico.", "A resposta certa é a C.", "Isso é artigo científico."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Qual o objetivo principal de um Artigo de Opinião?",
+            options: ["Fazer o leitor rir.", "Defender uma tese/opinião para convencer o leitor.", "Apenas informar a previsão do tempo.", "Narrar uma história de ficção com fadas."],
+            correct: 1,
+            explanation: {
+                correct: "Sendo um texto dissertativo-argumentativo, o artigo de opinião visa à persuasão do receptor sobre um tema relevante.",
+                options: ["Esse é o papel do humor/crônica.", "A resposta certa é a B.", "Apenas informa (Referencial).", "Isso é um conto/fábula."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Sobre a linguagem da Crônica Literária, é correto afirmar que ela costuma ser:",
+            options: ["Estritamente técnica e jargonal.", "Mais leve, coloquial e muito próxima da fala do leitor.", "Rebuscada e cheia de palavras do século XVIII.", "Totalmente impessoal, proibindo a 1ª pessoa."],
+            correct: 1,
+            explanation: {
+                correct: "A crônica busca criar um laço de intimidade com o leitor, imitando muitas vezes um tom de 'conversa de bar' ou desabafo.",
+                options: ["A crônica repele a linguagem técnica dura.", "A resposta certa é a B.", "Evita-se o rebuscamento inútil.", "A 1ª pessoa é fartamente usada na crônica."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "O Artigo de Opinião pertence predominantemente a qual tipologia textual?",
+            options: ["Narrativa", "Descritiva", "Dissertativa-Argumentativa", "Injuntiva"],
+            correct: 2,
+            explanation: {
+                correct: "Todo artigo que defende ponto de vista com argumentos lógicos é classificado como Dissertativo-Argumentativo.",
+                options: ["Não foca na contação de história.", "Não foca na fotografia visual.", "A resposta certa é a C.", "Não é um manual de instruções."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "Onde as crônicas e artigos de opinião encontram seu espaço natural de publicação?",
+            options: ["Apenas em livros de poesia.", "Em jornais, revistas e portais de notícias.", "Em manuais de eletrodomésticos.", "Em bulas de remédio."],
+            correct: 1,
+            explanation: {
+                correct: "Ambos são gêneros nascidos no jornalismo. A crônica para aliviar o peso das notícias; o artigo para opinar sobre elas.",
+                options: ["Não são exclusividade poética.", "A resposta certa é a B.", "Não instruem montagem.", "Não instruem dosagem."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "Em relação ao seu tamanho (extensão), a crônica é reconhecida por ser um texto:",
+            options: ["Muito longo, divido em dezenas de capítulos.", "Curto, lido em poucos minutos, capturando um instante efêmero.", "Infinito, publicado em partes por anos.", "Longo apenas na introdução."],
+            correct: 1,
+            explanation: {
+                correct: "A palavra 'crônica' vem de Cronos (tempo). É um texto rápido, consumido no mesmo tempo do jornal do dia.",
+                options: ["Isso seria um romance.", "A resposta certa é a B.", "Isso seria novela literária.", "A crônica vai direto ao ponto."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Quem é o responsável por assinar o Artigo de Opinião e responder pelo que foi escrito nele?",
+            options: ["O próprio autor (articulista), já que a opinião é dele.", "O presidente do jornal, sempre.", "É proibido assinar artigos de opinião.", "O leitor."],
+            correct: 0,
+            explanation: {
+                correct: "Diferente da notícia e do editorial (que representa o jornal), o artigo expressa a visão pessoal de quem o assina.",
+                options: ["A resposta certa é a A.", "A opinião do jornal vai no Editorial.", "A assinatura é obrigatória/esperada.", "O leitor apenas consome."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "No contexto do Artigo de Opinião, o que chamamos de 'Tese'?",
+            options: ["O fechamento do texto.", "A ideia central, o posicionamento que o autor vai defender ao longo do texto.", "O título da matéria.", "Os dados estatísticos apresentados."],
+            correct: 1,
+            explanation: {
+                correct: "A tese é a espinha dorsal da argumentação. É a opinião resumida que o autor tenta provar ser correta.",
+                options: ["Isso é a conclusão.", "A resposta certa é a B.", "Título é apenas a chamada.", "Dados são argumentos, não a tese."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "A crônica permite o uso do humor e da ironia?",
+            options: ["Não, a crônica é um texto jurídico e sério.", "Sim, o humor, a ironia e o tom crítico-satírico são características frequentes desse gênero.", "Apenas se o jornal permitir piadas prontas.", "Não, pois o humor anula a narração."],
+            correct: 1,
+            explanation: {
+                correct: "Muitos dos maiores cronistas (Luis Fernando Verissimo, por ex.) usam o humor como lente para criticar o cotidiano.",
+                options: ["É um texto literário/jornalístico livre.", "A resposta certa é a B.", "Não depende de piada pronta, é estilo do autor.", "Humor potencializa a crônica."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "Qual figura gramatical é evitada na notícia pura, mas é a base do Artigo de Opinião?",
+            options: ["Uso de verbos no passado.", "A marcação da subjetividade (posicionamento pessoal e juízos de valor).", "Uso de pontos finais.", "Adjetivos pátrios (brasileiro, francês)."],
+            correct: 1,
+            explanation: {
+                correct: "A notícia busca neutralidade. O artigo existe EXATAMENTE para apresentar a subjetividade (a opinião) do autor.",
+                options: ["Ambos usam o passado.", "A resposta certa é a B.", "Ambos usam pontuação padrão.", "Ambos usam adjetivos geográficos."]
+            }
+        },
+
+// MÉDIAS (11-20)
+        {
+            id: 11, level: "Médio",
+            text: "Qual é a diferença básica de foco entre uma Reportagem e uma Crônica que tratam de um assalto a ônibus?",
+            options: ["Nenhuma, ambos os textos terão a mesma linguagem técnica.", "A reportagem busca fatos, dados e falas da polícia; a crônica foca no sentimento do passageiro ou na ironia da situação.", "A crônica é mais longa e profunda em estatísticas.", "A reportagem sempre defende o assaltante."],
+            correct: 1,
+            explanation: {
+                correct: "O jornalismo informa a materialidade (quem, quando, onde). A literatura (crônica) explora a condição humana e a emoção do fato.",
+                options: ["A crônica repudia a linguagem técnica.", "A resposta certa é a B.", "A crônica não lida com estatísticas duras.", "Reportagem foca nos fatos, não na defesa criminal."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "O que define estruturalmente uma Crônica Argumentativa?",
+            options: ["Um texto que apenas cita leis constitucionais.", "Um texto que funde a leveza de um relato do cotidiano com a defesa firme de um ponto de vista crítico sobre a sociedade.", "Um artigo de opinião sem título.", "Uma fábula com animais racionais."],
+            correct: 1,
+            explanation: {
+                correct: "A crônica argumentativa pega você pela mão narrando um evento simples e, quando você percebe, está lendo uma crítica social ácida.",
+                options: ["Seria texto injuntivo/expositivo.", "A resposta certa é a B.", "Falta de título não define gênero.", "Fábula é outro gênero literário."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "No desenvolvimento de um Artigo de Opinião, o que o autor utiliza para validar sua tese?",
+            options: ["Estratégias argumentativas (dados, fatos históricos, citações de especialistas).", "Apenas a repetição exaustiva da tese.", "Rimas ricas e métrica perfeita.", "Fotos ilustrativas do autor."],
+            correct: 0,
+            explanation: {
+                correct: "A opinião pura não convence. Ela precisa ser calçada por estratégias de argumentação sólidas (provas lógicas ou de autoridade).",
+                options: ["A resposta certa é a A.", "Repetição não persuade, irrita (Tautologia).", "Isso é para a poesia.", "Imagem não valida argumento textual lógico."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "Como geralmente se estrutura a Conclusão de um Artigo de Opinião?",
+            options: ["Com um 'Era uma vez' ou 'Fim'.", "Com uma síntese da tese defendida e, frequentemente, com uma proposta de intervenção/solução para o problema.", "Sem finalizar o raciocínio, deixando o leitor criar o final.", "Apenas xingando os opositores."],
+            correct: 1,
+            explanation: {
+                correct: "Todo texto argumentativo precisa fechar o ciclo lógico: retoma-se a tese confirmada pelos argumentos e aponta-se um caminho.",
+                options: ["Linguagem infantil/narrativa de contos.", "A resposta certa é a B.", "Artigo de opinião exige conclusão clara.", "Fere a ética e invalida a racionalidade argumentativa."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "Por que se diz que a Crônica é um gênero 'efêmero'?",
+            options: ["Porque os livros de crônica apodrecem mais rápido.", "Porque ela geralmente trata de assuntos datados do momento atual, perdendo o 'frescor' da novidade com o tempo.", "Porque é escrita apenas por jovens.", "Porque usa linguagem técnica que muda a cada década."],
+            correct: 1,
+            explanation: {
+                correct: "Efêmero é o que dura pouco. Como a crônica reflete o dia a dia do jornal, um comentário sobre a chuva de ontem perde a força na semana que vem.",
+                options: ["Absurdo físico.", "A resposta certa é a B.", "Não tem limite etário.", "Não usa jargão técnico."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "No Artigo de Opinião, o uso da 1ª pessoa (singular ou plural - 'nós acreditamos') é:",
+            options: ["Totalmente proibido pelas regras da ABNT.", "Comum e permitido, pois reforça que o texto é um posicionamento de quem o assina, gerando proximidade persuasiva.", "Obrigatório em todas as frases.", "Um erro de concordância grave."],
+            correct: 1,
+            explanation: {
+                correct: "Diferente da dissertação do ENEM (onde o 'nós' é evitado), o artigo de jornal abraça a autoria assumida e subjetiva.",
+                options: ["Não é artigo científico rígido.", "A resposta certa é a B.", "Pode-se usar a 3ª pessoa impessoal também.", "Não fere a gramática."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "Ao ler uma crônica que narra detalhadamente a textura de um pão quente e o cheiro do café na padaria, qual tipologia atua como apoio à narração?",
+            options: ["Argumentativa", "Injuntiva", "Descritiva", "Normativa"],
+            correct: 2,
+            explanation: {
+                correct: "A captação sensorial (visão, olfato) e o detalhamento físico das coisas marcam a presença forte da descrição dentro do texto literário.",
+                options: ["Não há opinião a defender aqui.", "Não há instrução de como fazer pão.", "A resposta certa é a C.", "Não há lei ou regra."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "A relação que o Cronista busca estabelecer com seu leitor é geralmente de:",
+            options: ["Superioridade intelectual agressiva.", "Distanciamento acadêmico e frieza cirúrgica.", "Cumplicidade, intimidade e identificação ('como se conversassem no sofá').", "Hierarquia militar (emissor manda, receptor obedece)."],
+            correct: 2,
+            explanation: {
+                correct: "O cronista fala 'com' o leitor, não 'para' o leitor. Ele convida o leitor a reconhecer a si mesmo naquelas cenas cotidianas.",
+                options: ["Destrói a simpatia literária.", "Isso é característica da ciência.", "A resposta certa é a C.", "Isso é texto injuntivo extremo."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "Em um Artigo de Opinião sobre tecnologia, o autor cita dados precisos do IBGE. Esses dados funcionam como:",
+            options: ["Tese central.", "Argumentos de provas concretas, para dar credibilidade e forçar o leitor a concordar racionalmente com a tese.", "Falácias lógicas.", "Enfeite estilístico da função poética."],
+            correct: 1,
+            explanation: {
+                correct: "Dados de fontes confiáveis (IBGE) materializam o argumento. É difícil o leitor refutar um número oficial, fortalecendo a persuasão.",
+                options: ["A tese é a opinião, o dado é a prova.", "A resposta certa é a B.", "São dados reais, não mentiras lógicas.", "Têm função pragmática de prova, não estética."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "O que é um Editorial de jornal e como ele difere do Artigo de Opinião?",
+            options: ["Não há diferença, são sinônimos perfeitos.", "O artigo tem a opinião do autor que o assina; o Editorial representa a opinião oficial e institucional do próprio jornal (não tem assinatura pessoal).", "O Editorial é focado em esportes, o Artigo em política.", "O Editorial é sempre um poema longo."],
+            correct: 1,
+            explanation: {
+                correct: "O Editorial é a 'voz da empresa'. O Artigo de Opinião é a 'voz de um colunista/especialista' (que pode até discordar da empresa).",
+                options: ["Diferem na autoria.", "A resposta certa é a B.", "Tema livre para ambos.", "Não utilizam tipologia poética."]
+            }
+        },
+
+// DIFÍCEIS (21-30)
+        {
+            id: 21, level: "Difícil",
+            text: "Em provas do IFCE, é comum pedir para diferenciar FATO de OPINIÃO em trechos de Artigos. Qual trecho abaixo é puramente OPINIÃO (Tese)?",
+            options: ["O governador reduziu o repasse de verbas para a segurança em 10%.", "Foram registrados 400 acidentes nesta rodovia em 2023.", "A atual gestão estadual é negligente e fracassou vergonhosamente na proteção dos cidadãos.", "A lei 12.345 foi sancionada na última terça-feira."],
+            correct: 2,
+            explanation: {
+                correct: "O uso de adjetivos e advérbios de valor ('negligente', 'fracassou vergonhosamente') revela o julgamento humano, saindo do fato e entrando na opinião.",
+                options: ["Fato numérico.", "Fato estatístico.", "A resposta certa é a C.", "Fato jurídico."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "O uso do recurso da 'Concessão' num Artigo de Opinião (ex: 'É verdade que a tecnologia facilita a vida, PORÉM ela isola as pessoas...') tem a função técnica de:",
+            options: ["Anular o próprio argumento e confundir a banca.", "Antecipar um argumento do adversário e dar-lhe razão parcial, para depois derrubá-lo com um argumento mais forte, demonstrando visão ampla.", "Aumentar o número de palavras.", "Fugir do tema proposto."],
+            correct: 1,
+            explanation: {
+                correct: "A concessão é uma tática argumentativa brilhante. Mostra que o autor não é cego; ele vê o lado positivo, mas prova que o lado negativo (sua tese) pesa mais.",
+                options: ["O 'porém' salva o argumento principal.", "A resposta certa é a B.", "Tática avaliada por qualidade, não quantidade.", "Aborda o tema com complexidade."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "A Crônica Filosófica distingue-se do Artigo de Opinião principalmente porque:",
+            options: ["Reflete sobre questões profundas (vida, morte, amor) de forma poética e aberta, sem a obrigação de forçar o leitor a aceitar uma tese rígida.", "Usa gráficos e tabelas para provar que a vida existe.", "É escrita obrigatoriamente por filósofos formados com CRM.", "Não faz diferença, a tipologia é idêntica."],
+            correct: 0,
+            explanation: {
+                correct: "A crônica deixa a porta aberta para a divagação literária. O artigo de opinião bate o martelo e diz: 'esta é a verdade, concorde comigo'.",
+                options: ["A resposta certa é a A.", "Não usa dados estatísticos duros na filosofia lírica.", "Profissão não restringe autoria.", "Um é narrativa reflexiva, outro é dissertação."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "Modalizadores Discursivos (como: infelizmente, de fato, é urgente que, sem dúvida) são cruciais no Artigo de Opinião porque:",
+            options: ["Corrigem erros de digitação do autor.", "Eles marcam a subjetividade do emissor, indicando o seu grau de certeza ou o seu sentimento em relação ao que está sendo dito.", "Transformam o texto numa crônica narrativa.", "Ditam ordens no modo imperativo literal."],
+            correct: 1,
+            explanation: {
+                correct: "A palavra 'infelizmente' não muda o fato narrado, mas carimba no fato a tristeza e a opinião do autor (marca de persuasão).",
+                options: ["Não têm função ortográfica.", "A resposta certa é a B.", "Eles reforçam a argumentação, não a narração.", "Não são verbos, são advérbios/expressões."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "A 'Falácia' é o grande inimigo da argumentação no Artigo de Opinião. O que caracteriza um argumento falacioso?",
+            options: ["Argumento baseado em provas matemáticas certificadas.", "Argumento que apresenta uma falha de raciocínio lógico, mascarado de verdade, que invalida a defesa da tese.", "Uma citação em latim.", "Qualquer opinião contrária ao governo."],
+            correct: 1,
+            explanation: {
+                correct: "Uma falácia (como generalização apressada ou ataque pessoal) destrói a validade da argumentação porque baseia-se num erro de lógica.",
+                options: ["Isso é argumento forte.", "A resposta certa é a B.", "O idioma não define falha lógica.", "Opinião política não define falha lógica."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Machado de Assis e Rubem Braga são reconhecidos na literatura brasileira não apenas por romances, mas como grandes mestres de qual gênero?",
+            options: ["Bula médica.", "Editorial corporativo.", "Crônica, capturando o cotidiano urbano de suas épocas com ironia e lirismo.", "Artigo científico quantitativo."],
+            correct: 2,
+            explanation: {
+                correct: "Rubem Braga é considerado o criador da crônica moderna no Brasil. Machado consolidou o gênero no século XIX com profunda ironia.",
+                options: ["Gênero injuntivo sem valor literário de autoria clássica.", "Gênero impessoal.", "A resposta certa é a C.", "Não atuavam na ciência exata."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "Analise: 'Fui à padaria. Comprei pão. Voltei para casa.' Qual a deficiência deste trecho para ser considerado uma boa CRÔNICA?",
+            options: ["Não tem verbos.", "É excessivamente longo.", "Carece do 'quê' literário: falta reflexão, humor, lirismo ou quebra de expectativa sobre esse fato banal.", "É um artigo de opinião disfarçado."],
+            correct: 2,
+            explanation: {
+                correct: "A crônica usa a padaria como pretexto. Só relatar a compra do pão de forma mecânica é um mero relato vazio, não arte literária.",
+                options: ["Tem três verbos.", "É curtíssimo.", "A resposta certa é a C.", "Não tem tese nenhuma."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "O Título no Artigo de Opinião desempenha duas funções textuais fundamentais. São elas:",
+            options: ["Referencial (antecipar o tema central) e Apelativa (seduzir e instigar o leitor a ler o texto).", "Poética e Fática apenas.", "Narrativa (contar o final) e Injuntiva.", "Estritamente decorativa, sem ligação com o texto."],
+            correct: 0,
+            explanation: {
+                correct: "Um bom título de artigo informa sobre o que o texto trata (informação) e usa gatilhos persuasivos (apelo) para fisgar o clique/leitura.",
+                options: ["A resposta certa é a A.", "Não foca na rima nem no teste de canal.", "Revelar o final (spoiler) não é regra argumentativa.", "O título é a isca principal, vital."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "Em um comando de prova do IFCE que exija a escrita de um 'Artigo de Opinião', a fuga de gênero e consequente NOTA ZERO ocorrerá com certeza se o candidato:",
+            options: ["Posicionar-se firmemente contra a opinião da maioria, mas embasar bem.", "Criar um enredo fictício sobre um personagem que vive o problema, ignorando a estrutura de introdução, argumentação e conclusão da tese.", "Usar dados do IBGE para provar o seu ponto.", "Assinar o texto, caso o edital tenha exigido uma máscara (ex: 'Assine como Estudante')."],
+            correct: 1,
+            explanation: {
+                correct: "Fazer uma narração (conto/crônica) quando a prova pede Dissertação-Argumentativa (Artigo) caracteriza 'Fuga ao Tipo Textual', erro fatal.",
+                options: ["Ir contra a maré é permitido, se bem argumentado.", "A resposta certa é a B.", "Uso de dados é excelente.", "Assinar como a prova pede é correto."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "Qual é o efeito do uso de 'Perguntas Retóricas' (aquelas que não exigem resposta direta) dentro de um Artigo de Opinião?",
+            options: ["Preencher linhas do texto para bater o mínimo exigido.", "Provocar a reflexão no leitor, conduzindo-o silenciosamente a concordar com a tese implícita na pergunta.", "Demonstrar que o autor não sabe o assunto e precisa de ajuda.", "Testar a inteligência do corretor da prova."],
+            correct: 1,
+            explanation: {
+                correct: "A pergunta retórica ('Até quando aceitaremos a corrupção?') engaja o leitor. Ele responde mentalmente ('não devemos aceitar'), adotando a tese do autor.",
+                options: ["Tática pobre que desconta nota.", "A resposta certa é a B.", "É tática persuasiva, não ignorância.", "Não visa o avaliador, visa o argumento."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#475569', '#94A3B8', '#DC2626', '#334155'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#475569', '#94A3B8', '#DC2626', '#334155'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★★★" : percent >= 60 ? "★★★☆☆" : "★☆☆☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>⚠ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>★ Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

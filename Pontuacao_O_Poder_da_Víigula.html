@@ -1,10 +1,722 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pontuação - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema: Pontuação/Sintaxe - Grafite (Estrutura) e Ciano (Pausa/Destaque) */
+            --bg-color: #F8FAFC;
+            --text-color: #0F172A;
+            --border-color: #334155;
+            --white: #FFFFFF;
+            --theme-light: #CFFAFE;
+            --theme-medium: #14B8A6;
+            --theme-dark: #0F766E;
+            --theme-contrast: #E11D48;
+            --theme-accent: #99F6E4;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #F8FAFC; border-left: 4px solid var(--theme-dark); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #334155; }
+        .highlight-box.warning { background-color: #FFF1F2; border-left-color: #E11D48; color: #9F1239; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--white); background: var(--theme-dark); cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-contrast); color: var(--white); box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">,</span> PROMOVER</div>
+        <h1>Língua Portuguesa | IFCE</h1>
+        <p class="subtitle">Pontuação: O Poder da Vírgula</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar regra" placeholder="Pesquisar regra...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">1. O Mito da Respiração</span>
+            <div class="theory-box">
+                <h3>Vírgula é Sintaxe, não pulmão!</h3>
+                <p>A vírgula <strong>não</strong> serve para indicar pausa para respirar. Ela serve para organizar a ordem sintática da frase. A ordem direta do Português é: <strong>Sujeito + Verbo + Complemento + Adj. Adverbial</strong>. Quando a frase está nessa ordem, quase nunca há vírgula.</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">2. O que é PROIBIDO?</span>
+            <div class="theory-box">
+                <h3>Não separe o que nasceu junto</h3>
+                <p>- <strong>NUNCA</strong> separe o Sujeito do seu Verbo. (Ex errado: <em>O aluno, estudou.</em>)<br>
+                    - <strong>NUNCA</strong> separe o Verbo do seu Objeto/Complemento. (Ex errado: <em>O aluno comprou, um livro.</em>)</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">3. Quando a Vírgula é Obrigatória?</span>
+            <div class="theory-box">
+                <h3>Isolando Intrusos e Deslocamentos</h3>
+                <p>
+                    - <strong>Vocativo:</strong> Chamamento. (Ex: <em>Mãe, vem aqui!</em>)<br>
+                    - <strong>Aposto:</strong> Explicação. (Ex: <em>Brasília, a capital do Brasil, é quente.</em>)<br>
+                    - <strong>Adjunto Adverbial Deslocado:</strong> Quando a circunstância vai pro início. (Ex: <em>Na semana passada, choveu.</em>)<br>
+                    - <strong>Enumeração:</strong> (Ex: <em>Comprei pão, leite, ovos e queijo.</em>)
+                </p>
+                <div class="highlight-box warning">
+                    <strong>Cuidado com o "E":</strong> A regra geral é não usar vírgula antes do "e". Mas se as orações tiverem <strong>sujeitos diferentes</strong>, a vírgula antes do "e" é recomendada. Ex: <em>O sol nasceu, e os pássaros cantaram.</em>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Iniciar Diagnóstico (30 Q) →</button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!</p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE DADOS - 30 QUESTÕES
+    const questions = [
+// FÁCEIS (1-10)
+        {
+            id: 1, level: "Fácil",
+            text: "Qual é a regra mais básica e proibitiva sobre o uso da vírgula na língua portuguesa?",
+            options: ["Não se pode usar vírgula antes da palavra 'e' em nenhum caso.", "Não se deve separar o sujeito de seu respectivo verbo.", "A vírgula só pode ser usada uma vez por frase.", "Toda frase deve terminar com vírgula."],
+            correct: 1,
+            explanation: {
+                correct: "O sujeito e o verbo formam a base indissociável da oração. Separar 'O aluno, estudou' é um erro sintático grave.",
+                options: ["Há exceções (sujeitos diferentes).", "A resposta certa é a B.", "Pode-se usar várias vírgulas, desde que justificadas.", "Frases terminam com ponto."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Assinale a alternativa em que a vírgula foi usada para separar uma ENUMERAÇÃO de elementos:",
+            options: ["Maria, preste atenção na aula.", "Eu comprei arroz, feijão, carne e salada.", "Amanhã, se não chover, iremos ao parque.", "São Paulo, a maior cidade do Brasil, não para."],
+            correct: 1,
+            explanation: {
+                correct: "A vírgula atua organizando uma lista ou sequência de termos que exercem a mesma função sintática (vários objetos comprados).",
+                options: ["Vírgula separa o vocativo.", "A resposta certa é a B.", "Vírgula separa oração intercalada.", "Vírgula separa o aposto."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Leia: 'Mãe, posso ir brincar na rua?'. A vírgula após 'Mãe' é obrigatória porque isola o:",
+            options: ["Aposto", "Adjunto Adverbial", "Vocativo", "Sujeito"],
+            correct: 2,
+            explanation: {
+                correct: "O vocativo (chamamento, invocação) não pertence à estrutura sintática do sujeito ou predicado, devendo ser sempre isolado por vírgula.",
+                options: ["Aposto explica algo.", "Adjunto adverbial indica circunstância.", "A resposta certa é a C.", "O sujeito oculto do 'posso' é 'eu', não a 'mãe'."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Qual destas frases apresenta um ERRO no uso da vírgula?",
+            options: ["Os professores de matemática, aplicaram a prova.", "João, traga-me o caderno.", "Ontem à noite, nós fomos ao cinema.", "O Brasil, país tropical, é imenso."],
+            correct: 0,
+            explanation: {
+                correct: "Na opção A, a vírgula está separando o sujeito ('Os professores de matemática') do seu verbo ('aplicaram'), o que é proibido.",
+                options: ["A resposta certa é a A (contém erro).", "Uso correto do vocativo.", "Uso correto do adjunto adverbial deslocado.", "Uso correto do aposto."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "O Aposto é um termo que explica, resume ou detalha um nome anterior. A regra exige que o aposto explicativo seja:",
+            options: ["Sempre seguido de ponto de interrogação.", "Escrito em letras maiúsculas.", "Isolado por vírgulas.", "Colocado no final do texto."],
+            correct: 2,
+            explanation: {
+                correct: "Por ser uma quebra na fluidez da oração para adicionar uma explicação extra, o aposto explicativo deve vir entre vírgulas.",
+                options: ["Regra inexistente.", "Regra ortográfica sem ligação.", "A resposta certa é a C.", "Pode vir no meio da frase."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "A Ordem Direta da oração em português é: Sujeito + Verbo + Complementos + Adjunto Adverbial. Quando a frase está nessa ordem exata:",
+            options: ["O uso da vírgula é geralmente desnecessário e muitas vezes proibido.", "A vírgula é obrigatória após o sujeito.", "A vírgula é obrigatória antes do verbo.", "Deve-se separar o verbo do complemento com vírgula."],
+            correct: 0,
+            explanation: {
+                correct: "A pontuação serve para marcar deslocamentos. Se os termos estão em seu lugar de nascença lógico, a frase flui sem necessidade de pausas sintáticas.",
+                options: ["A resposta certa é a A.", "Isso é erro crasso.", "Erro sintático.", "Isso corta a regência do verbo."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "Em qual frase a vírgula está justificando a isolação de uma expressão explicativa ou retificativa?",
+            options: ["Ou seja, nós perdemos o jogo.", "Ele chorou, porque estava triste.", "José, Maria e Ana foram à feira.", "Menino, saia da chuva!"],
+            correct: 0,
+            explanation: {
+                correct: "Expressões como 'ou seja', 'isto é', 'a saber', 'por exemplo' devem sempre ser isoladas por vírgula.",
+                options: ["A resposta certa é a A.", "Vírgula antes de conjunção causal/explicativa.", "Enumeração.", "Vocativo."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "Leia as frases e assinale a que altera completamente o sentido por causa da vírgula:",
+            options: ["Não, espere. / Não espere.", "Amanhã, choverá. / Amanhã choverá.", "Eu gosto de, maçã. / Eu gosto de maçã.", "Maria, cante. / Maria, cante."],
+            correct: 0,
+            explanation: {
+                correct: "A primeira frase pede que a pessoa aguarde. A segunda proíbe a pessoa de aguardar. A vírgula muda a polaridade da ação.",
+                options: ["A resposta certa é a A.", "Mesmo sentido.", "A primeira contém erro grave, mas o sentido alvo é o mesmo.", "São idênticas."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "A vírgula é usada nas datas e endereços oficiais (Ex: Fortaleza, 15 de maio de 2024). Ela serve para separar:",
+            options: ["O dia do mês.", "O mês do ano.", "O nome da localidade da data.", "O dia da semana."],
+            correct: 2,
+            explanation: {
+                correct: "É uma convenção normativa usar a vírgula para isolar o topônimo (nome do lugar) da marcação temporal que se segue.",
+                options: ["Usa-se a preposição 'de'.", "Usa-se a preposição 'de'.", "A resposta certa é a C.", "A data já o faz."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "A vírgula pode ser usada para indicar a omissão de um verbo que já foi citado anteriormente (Elipse/Zeugma). Assinale o exemplo correto dessa regra:",
+            options: ["Eu gosto de maçã, ele de banana.", "A maçã, é muito gostosa.", "Eu gosto, de comer maçã.", "Eu, gosto de maçã."],
+            correct: 0,
+            explanation: {
+                correct: "A vírgula substitui o verbo 'gostar' na segunda oração ('ele [gosta] de banana'), evitando repetição cansativa.",
+                options: ["A resposta certa é a A.", "Separou sujeito do verbo (erro).", "Separou verbo do complemento (erro).", "Separou sujeito do verbo (erro)."]
+            }
+        },
+
+// MÉDIAS (11-20)
+        {
+            id: 11, level: "Médio",
+            text: "A regra de deslocamento do Adjunto Adverbial dita que se ele vier no INÍCIO da oração e for de LONGA extensão (3 ou mais palavras), a vírgula é:",
+            options: ["Proibida.", "Obrigatória.", "Facultativa.", "Substituída por ponto e vírgula."],
+            correct: 1,
+            explanation: {
+                correct: "Para evitar confusão sintática com o sujeito que deveria estar no início, a gramática normativa exige a vírgula para marcar o adjunto longo deslocado.",
+                options: ["Falso.", "A resposta certa é a B.", "Facultativa apenas para adjuntos curtos (1 ou 2 palavras, ex: 'Ontem saí').", "Falso."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "Qual das frases abaixo apresenta pontuação CORRETA em relação ao adjunto adverbial de curta extensão (uma palavra)?",
+            options: ["Ontem choveu muito.", "Ontem, choveu muito.", "Ambas as frases estão corretas, pois a vírgula é facultativa.", "Ambas estão erradas."],
+            correct: 2,
+            explanation: {
+                correct: "Para advérbios simples (Hoje, Ontem, Aqui) deslocados, o uso da vírgula fica a critério do autor para dar ênfase rítmica, sendo ambas corretas.",
+                options: ["Correta.", "Correta.", "A resposta certa é a C.", "Falso."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "Normalmente não usamos vírgula antes da conjunção aditiva 'E'. No entanto, há um caso em que ela é permitida/recomendada. Quando?",
+            options: ["Quando o 'E' for a primeira palavra do texto.", "Quando as orações ligadas pelo 'E' possuírem sujeitos diferentes.", "Quando a frase for muito curta.", "Quando o 'E' tiver som de 'I'."],
+            correct: 1,
+            explanation: {
+                correct: "Ex: 'O professor explicou a matéria, e os alunos dormiram'. A vírgula evita que o cérebro leia os dois sujeitos como uma coisa só antes de chegar no segundo verbo.",
+                options: ["Falso.", "A resposta certa é a B.", "Tamanho não dita a regra sintática.", "Critério fonético não dita regra de pontuação."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "Leia: 1) Os jogadores que treinaram viajarão. 2) Os jogadores, que treinaram, viajarão. A diferença de sentido, garantida pelas vírgulas, é:",
+            options: ["Na frase 1, todos treinaram. Na frase 2, apenas alguns.", "Na frase 1 (sem vírgula), apenas uma parte dos jogadores treinou. Na frase 2 (com vírgulas), todos os jogadores treinaram.", "A vírgula na frase 2 indica um erro grave.", "Não há diferença de sentido, apenas de entonação."],
+            correct: 1,
+            explanation: {
+                correct: "Sem vírgula = Oração Restritiva (restringe ao grupo que treinou). Com vírgula = Oração Explicativa (generaliza afirmando que a totalidade deles treinou).",
+                options: ["Está invertido.", "A resposta certa é a B.", "É gramaticalmente perfeito.", "A semântica lógica muda totalmente."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "A vírgula antes das conjunções adversativas (MAS, PORÉM, CONTUDO) no meio do período composto é:",
+            options: ["Obrigatória para marcar a quebra de expectativa entre as orações.", "Proibida pela ABNT.", "Facultativa, depende de como o autor quer que o leitor respire.", "Substituída sempre por ponto final."],
+            correct: 0,
+            explanation: {
+                correct: "A vírgula sinaliza a articulação entre as orações coordenadas, e a gramática prescreve seu uso antes das conjunções opositivas.",
+                options: ["A resposta certa é a A.", "Falso.", "Respiração não é critério sintático.", "Pode-se usar ponto, mas a vírgula é o conectivo padrão."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "Identifique a frase em que o uso das vírgulas para isolar a conjunção deslocada está CORRETO:",
+            options: ["O aluno, estudou muito; não, conseguiu passar.", "O aluno estudou muito; não conseguiu, porém, passar.", "O aluno estudou muito, não conseguiu passar porém.", "O aluno estudou muito porém não, conseguiu passar."],
+            correct: 1,
+            explanation: {
+                correct: "Quando a conjunção coordenativa (porém) não vem no início de sua oração, ela está intercalada ou deslocada e deve obrigatoriamente ficar entre vírgulas.",
+                options: ["Erro crasso de separação.", "A resposta certa é a B.", "Falta vírgula antes de porém.", "Vírgula separando a negação do verbo."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "O que justifica as vírgulas na frase: 'A corrupção, infelizmente, destruiu o país'?",
+            options: ["O isolamento do sujeito.", "O isolamento de um verbo intransitivo.", "O isolamento de um advérbio modalizador de opinião intercalado na ordem direta da frase.", "A enumeração de sentimentos."],
+            correct: 2,
+            explanation: {
+                correct: "O advérbio 'infelizmente' entrou quebrando a ordem direta 'A corrupção (sujeito) destruiu (verbo)'. Termos intercalados no meio da base devem ficar entre vírgulas.",
+                options: ["O sujeito não deve ser isolado do verbo.", "Não é verbo.", "A resposta certa é a C.", "Não é enumeração."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "Leia a frase: 'Comprou cadernos, canetas, livros, e, saiu da loja'. Qual é o ERRO de pontuação nesta frase?",
+            options: ["Falta vírgula depois de 'loja'.", "A vírgula antes e depois do 'e' é desnecessária e corta a ligação direta da última ação.", "Os objetos deveriam ter ponto final.", "Deveria haver ponto e vírgula após cadernos."],
+            correct: 1,
+            explanation: {
+                correct: "A conjunção 'e' já está ligando os dois verbos do mesmo sujeito (comprou e saiu). As vírgulas em torno dele quebram essa coordenação sem justificativa.",
+                options: ["Fim de frase leva ponto.", "A resposta certa é a B.", "Inviável.", "Incorreto e pesado."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "Nas Orações Subordinadas Adverbiais antecipadas (que vêm antes da Oração Principal), a vírgula é:",
+            options: ["Facultativa.", "Obrigatória. (Ex: 'Como choveu, não saí').", "Proibida.", "Usada apenas se a frase passar de 20 palavras."],
+            correct: 1,
+            explanation: {
+                correct: "A oração subordinada adverbial atua como um 'adjunto adverbial gigante'. Se ela é deslocada pro início, a regra é a mesma: vírgula obrigatória.",
+                options: ["A gramática normativa padrão exige.", "A resposta certa é a B.", "É o inverso.", "Tamanho em palavras não anula a regra estrutural."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Assinale a alternativa onde a vírgula é usada incorretamente, separando o verbo do seu objeto direto:",
+            options: ["João, Maria e Pedro, comeram o bolo.", "Eu disse a você que isso aconteceria.", "O governo aprovou, a nova lei de impostos.", "Naquela manhã fria, o sol não apareceu."],
+            correct: 2,
+            explanation: {
+                correct: "Aprovou o quê? 'A nova lei' é o objeto direto do verbo. A vírgula no meio corta essa ligação fundamental da regência verbal.",
+                options: ["A vírgula após Pedro também é discutível (sujeito composto do verbo), mas a C é o erro direto de regência.", "Correto.", "A resposta certa é a C.", "Correto."]
+            }
+        },
+
+// DIFÍCEIS (21-30)
+        {
+            id: 21, level: "Difícil",
+            text: "O Polissíndeto é uma figura de linguagem onde a conjunção se repete de propósito (Ex: E canta, e dança, e ri, e chora). Nesse caso literário, a vírgula antes do 'e':",
+            options: ["Continua sendo terminantemente proibida.", "É permitida e recomendada para marcar a pausa rítmica e a ênfase estilística entre as repetições.", "É considerada erro crasso no IFCE.", "Obriga o verbo a ir para o plural."],
+            correct: 1,
+            explanation: {
+                correct: "Na figura de linguagem do polissíndeto, a vírgula atua como marcador de cadência poética, contrariando a regra gramatical fria para efeito de estilo.",
+                options: ["A literatura permite a subversão justificada.", "A resposta certa é a B.", "O IFCE entende figuras de estilo.", "A concordância não muda por causa disso."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "O 'E' com valor adversativo (com sentido de 'MAS'). Exemplo: 'Fez de tudo para ajudar o filho, e ele não agradeceu'. A vírgula antes desse 'e':",
+            options: ["Deve ser removida imediatamente.", "É recomendada para evidenciar a quebra de expectativa sintática e semântica entre as orações.", "É um erro de digitação comum.", "Muda o tempo verbal da frase."],
+            correct: 1,
+            explanation: {
+                correct: "Quando a conjunção aditiva atua como adversativa (oposição), a vírgula ajuda o leitor a entender que o que vem a seguir não é uma soma, mas um contraste.",
+                options: ["Não, a vírgula é bem-vinda aqui.", "A resposta certa é a B.", "É uso culto.", "Tempo não se afeta pela vírgula aqui."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "A Inversão do Objeto (Objeto Direto Pleonástico). Em 'Os livros, eu os li ontem', a vírgula logo após 'livros' é justificada porque:",
+            options: ["Separa o sujeito 'livros' do verbo 'li'.", "O objeto direto 'Os livros' foi antecipado pro início da frase e depois repetido pelo pronome 'os' para dar ênfase.", "A palavra 'livros' atua como vocativo.", "Há uma conjunção oculta."],
+            correct: 1,
+            explanation: {
+                correct: "O objeto direto ('Os livros') saiu de sua posição normal (depois do verbo) para abrir a frase e ganhar destaque tópico. A vírgula isola essa quebra de ordem.",
+                options: ["O sujeito do verbo li é 'eu'.", "A resposta certa é a B.", "Ninguém está chamando o livro.", "Não há conectivo faltando."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "A vírgula antes da conjunção OU. Compare: 1) 'Você quer café ou chá?' 2) 'Ele deve ter 30, ou 31 anos'. Na frase 2, a vírgula antes do 'ou' marca:",
+            options: ["Uma exclusão absoluta.", "Uma hesitação, retificação ou correção imediata por parte do falante, diferente da exclusão pura da frase 1.", "Um erro ortográfico intencional.", "A soma das duas idades."],
+            correct: 1,
+            explanation: {
+                correct: "A vírgula antes do 'ou' quebra a opção estrita e revela que o autor está 'chutando', tentando corrigir o palpite anterior na mesma hora.",
+                options: ["Exclusão pura não leva vírgula (frase 1).", "A resposta certa é a B.", "Não tem erro.", "Isso seria 'e'."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "As orações coordenadas assindéticas (sem conjunção) são separadas por vírgulas. Mas se elas forem muito longas ou já possuírem vírgulas internas, deve-se usar:",
+            options: ["Ponto de exclamação.", "Apenas vírgulas, independentemente do tamanho.", "Ponto e vírgula (;), para evitar confusão hierárquica na leitura.", "Dois pontos."],
+            correct: 2,
+            explanation: {
+                correct: "O ponto e vírgula é uma 'super vírgula'. Ele separa blocos de orações que já contêm vírgulas menores dentro de si, organizando a leitura maior.",
+                options: ["Exclamação encerra o período com emoção.", "Isso criaria o 'caos das vírgulas'.", "A resposta certa é a C.", "Dois pontos anuncia algo (lista/explicação)."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "A palavra 'COMO' pode introduzir várias coisas. Qual frase exige vírgulas por usar o 'COMO' num sentido de Adjetivo Explicativo?",
+            options: ["Faça como eu mandei.", "O Brasil, como país emergente, sofre com crises.", "Ele agiu como uma criança.", "Como chovia não saímos."],
+            correct: 1,
+            explanation: {
+                correct: "A expressão atua explicando a natureza do sujeito (o fato de ser país emergente). É equivalente a um aposto explicativo, exigindo as vírgulas intercaladas.",
+                options: ["Conformidade sem vírgula no meio.", "A resposta certa é a B.", "Comparação sem vírgula direta.", "Causalidade no início."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "Na estrutura de Oração Intercalada: 'O governo deve, SE O PROJETO FOR APROVADO, investir na educação'. As vírgulas são:",
+            options: ["Opcionais, pois a frase é curta.", "Erradas, pois separam o verbo principal (deve) do seu auxiliar (investir).", "Obrigatórias, pois isolam uma oração subordinada adverbial condicional que invadiu o meio da oração principal.", "Sinais de subordinação substantiva."],
+            correct: 2,
+            explanation: {
+                correct: "A ordem seria: 'O governo deve investir... se o projeto for aprovado'. A oração do 'se' entrou rasgando o meio do verbo. O isolamento por vírgulas é vital.",
+                options: ["A estrutura exige o isolamento pela quebra grave da sintaxe.", "Elas não separam com erro, elas 'abrem a porta' para o intruso.", "A resposta certa é a C.", "É oração adverbial (condição)."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "Ao usar a conjunção 'QUE' integrante (Acho que vai chover), a vírgula é:",
+            options: ["Obrigatória antes do que.", "Obrigatória depois do que.", "Proibida antes do que, pois a oração subordinada substantiva (que vai chover) atua como objeto direto do verbo e não pode ser separada dele.", "Facultativa."],
+            correct: 2,
+            explanation: {
+                correct: "Eu acho (VTD) o quê? 'que vai chover' (Oração Subordinada Substantiva Objetiva Direta). Colocar vírgula é separar o verbo do objeto direto (crime sintático).",
+                options: ["Mito comum, muitas pessoas erram isso.", "Errado.", "A resposta certa é a C.", "Não é facultativa."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "O uso da vírgula antes do conectivo 'POIS'. Analise: 'Não vá, pois vai chover' e 'Ele é, pois, o culpado'. A diferença sintática é que:",
+            options: ["Na primeira, o pois é explicativo e fica após vírgula. Na segunda, o pois é conclusivo (deslocado) e fica entre vírgulas.", "Ambas têm o mesmo sentido, mas pontuações diferentes por estilo.", "A segunda frase está errada na norma culta.", "A primeira frase é uma ordem militar."],
+            correct: 0,
+            explanation: {
+                correct: "O 'pois' explicativo/causal vem antes do verbo da sua oração (vai chover). O 'pois' conclusivo vem depois do seu verbo (é) e fica imprensado por vírgulas.",
+                options: ["A resposta certa é a A.", "A semântica da conjunção muda totalmente.", "É plenamente culta.", "Não é ordem, é pedido/explicação."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "A supressão da vírgula num adjunto adverbial deslocado é permitida quando ele for curto. Mas em 'DE FORMA ALGUMA, eu aceitaria isso', a vírgula se torna recomendada para evitar:",
+            options: ["A ambiguidade de ler 'De forma alguma eu' como se o 'eu' não existisse de forma alguma.", "O cansaço da leitura.", "Que o leitor pronuncie a frase rapidamente.", "Para destacar que o 'eu' é o objeto."],
+            correct: 0,
+            explanation: {
+                correct: "Em casos de adjuntos modais/negativos no início, mesmo curtos, a falta de vírgula pode gerar um atrito com o sujeito seguinte, confundindo a decodificação inicial do leitor.",
+                options: ["A resposta certa é a A.", "Não afeta estresse visual.", "Respiração/velocidade não dita a regra de clareza aqui.", "O 'eu' é sujeito da ação 'aceitar'."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#0F766E', '#14B8A6', '#334155', '#E11D48'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#0F766E', '#14B8A6', '#334155', '#E11D48'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★★★" : percent >= 60 ? "★★★☆☆" : "★☆☆☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>⚠ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>★ Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>

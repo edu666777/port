@@ -1,10 +1,721 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advérbios e Circunstâncias - Promover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* Tema: Advérbios - Azul Celeste (Verbo/Ação) e Amarelo Mostarda (Circunstância/Modificação) */
+            --bg-color: #F8FAFC;
+            --text-color: #0F172A;
+            --border-color: #0F172A;
+            --white: #FFFFFF;
+            --theme-light: #E0F2FE;
+            --theme-medium: #38BDF8;
+            --theme-dark: #0284C7;
+            --theme-contrast: #D97706;
+            --theme-accent: #BAE6FD;
+            --theme-text-active: #FFFFFF;
+
+            /* NÃO ALTERAR AS CORES ABAIXO */
+            --correct-bg: #D1FAE5;
+            --correct-border: #059669;
+            --wrong-bg: #FFE4E6;
+            --wrong-border: #BE123C;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; padding-bottom: 100px;
+            background-image: linear-gradient(var(--theme-light) 1px, transparent 1px), linear-gradient(90deg, var(--theme-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-effect { animation: shake 0.4s ease-in-out; }
+        @keyframes fadeIn { from {opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .pulse-effect { animation: pulse 1s infinite; display: inline-block; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); color: var(--theme-contrast); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); color: var(--theme-contrast); }
+            100% { transform: scale(1); }
+        }
+        .logo-header { width: 100%; max-width: 600px; display: flex; justify-content: center;
+            flex-direction: column; align-items: center; padding: 20px 0 10px 0; }
+        .css-logo { font-size: 1.6rem; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -1px; border: 3px solid var(--border-color); padding: 8px 20px;
+            border-radius: 12px; background: var(--theme-dark); box-shadow: 4px 4px 0px var(--theme-contrast); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.8rem; font-weight: 900; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); text-align: center; }
+        .subtitle { font-size: 0.95rem; color: var(--theme-dark); font-weight: 600; text-align: center; }
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; }
+        .toggle-container { background-color: var(--white); border: 2px solid var(--border-color); border-radius: 50px; padding: 4px; display: flex; margin-bottom: 10px; box-shadow: 3px 3px 0px var(--border-color); }
+        .toggle-btn {flex: 1; border: none; background: none; padding: 12px 0; border-radius: 40px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; color: var(--theme-dark); cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { background-color: var(--theme-dark); color: var(--theme-text-active); box-shadow: 0px 2px 5px rgba(0,0,0,0.2); }
+        .view-section { display: none; animation: fadeIn 0.4s ease; flex-direction: column; gap: 20px; }
+        .search-container { position: relative; width: 100%; }
+        .search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-color); border-radius: 50px; background-color: var(--white); font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text-color); box-shadow: 4px 4px 0px var(--border-color); outline: none; transition: all 0.2s ease; }
+        .search-input:focus { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .search-icon {position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; opacity: 0.7; }
+        #no-results { text-align: center; color: var(--theme-dark); font-weight: 600; display: none; }
+        .content-group {display: flex; flex-direction: column; gap: 12px; }
+        .section-badge { display: inline-block; padding: 8px 16px; background-color: var(--theme-dark); color: var(--white); font-size: 0.9rem; font-weight: 700; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 3px 3px 0px rgba(0,0,0,0.2); text-transform: uppercase; align-self: flex-start; margin-bottom: 5px; }
+        .theory-box { display: flex; flex-direction: column; padding: 20px; border-radius: 16px; background-color: var(--white); border: 2px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); font-weight: 500; font-size: 0.95rem; line-height: 1.6; position: relative; overflow: hidden; gap: 15px; }
+        .theory-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background-color: var(--theme-contrast); border-right: 2px solid var(--border-color); }
+        .theory-box h3 {font-size: 1.2rem; font-weight: 900; color: var(--theme-dark); margin-bottom: 5px; border-bottom: 2px solid var(--theme-light); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        .visual-area { background: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 8px; padding: 15px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 20px; font-weight: bold; font-size: 1.5rem; color: var(--theme-contrast); text-align: center; }
+        .highlight-box { background-color: #E0F2FE; border-left: 4px solid var(--theme-dark); padding: 15px; border-radius: 6px; font-size: 0.9rem; color: #0284C7; }
+        .highlight-box.warning { background-color: #FEF3C7; border-left-color: #D97706; color: #92400E; }
+        .difficulty-badge {display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0px rgba(0,0,0,1); }
+        .dif-facil {background: #D1FAE5; color: #065F46; }
+        .dif-medio { background: #FEF08A; color: #713F12; }
+        .dif-dificil { background: #FECACA; color: #7F1D1D; }
+        .question-map { display: flex; gap: 8px; overflow-x: auto; padding: 10px 5px; margin-bottom: 20px; white-space: nowrap; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .question-map::-webkit-scrollbar {display: none; }
+        .map-dot { min-width: 35px; height: 35px; border: 2px solid var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: var(--white); background: var(--theme-dark); cursor: pointer; transition: all 0.2s; }
+        .map-dot.active { background-color: var(--theme-contrast); color: var(--text-color); box-shadow: 2px 2px 0px var(--border-color); transform: scale(1.1); }
+        .map-dot.answered-correct {background-color: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-border); }
+        .map-dot.answered-wrong { background-color: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-border); }
+        .option-btn { display: flex; align-items: center; width: 100%; padding: 16px; background-color: var(--white); border: 2px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.1s ease; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 600; text-align: left; color: var(--text-color); }
+        .option-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 5px 5px 0px var(--theme-contrast); border-color: var(--theme-dark); }
+        .opt-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border-color); margin-right: 15px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; background: var(--theme-light); color: var(--theme-dark); }
+        .option-btn.correct {background-color: var(--correct-bg); border-color: var(--correct-border); box-shadow: 2px 2px 0px var(--correct-border); }
+        .option-btn.correct .opt-circle {background-color: var(--correct-border); color: white; border-color: var(--correct-border); }
+        .option-btn.wrong {background-color: var(--wrong-bg); border-color: var(--wrong-border); opacity: 0.9; box-shadow: none; }
+        .option-btn.wrong .opt-circle {background-color: var(--wrong-border); color: white; border-color: var(--wrong-border); }
+        .option-btn.disabled {pointer-events: none; opacity: 0.7; }
+        .feedback-box { display: block; margin-top: 20px; background-color: #FAFAFA; border: 2px dashed var(--theme-dark); border-radius: 12px; padding: 20px; animation: slideUp 0.3s ease-out; }
+        .feedback-title { font-weight: 900; text-transform: uppercase; font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:8px; color: var(--theme-dark); }
+        .feedback-item { margin-bottom: 8px; font-size: 0.85rem; padding-left: 10px; border-left: 3px solid #CBD5E1; line-height: 1.5; color: #0F172A; }
+        .feedback-item.correct-opt {border-left-color: var(--correct-border); font-weight: 700; color: var(--correct-border); background: var(--correct-bg); padding: 10px; border-radius: 0 6px 6px 0; }
+        .feedback-item.wrong-opt {border-left-color: var(--wrong-border); color: #7F1D1D; }
+        .result-card {background: white; border: 3px solid var(--border-color); border-radius: 20px; padding: 30px; box-shadow: 6px 6px 0px var(--border-color); margin-bottom: 30px; text-align: center; }
+        .stars-container { font-size: 3.5rem; margin: 10px 0; letter-spacing: 5px; }
+        .percentage-big {font-size: 4.5rem; font-weight: 900; color: var(--theme-dark); line-height: 1; margin: 10px 0; text-shadow: 3px 3px 0px var(--theme-contrast); }
+        .btn-action { width: 100%; padding: 18px; background-color: var(--theme-dark); color: white; border: 3px solid var(--border-color); border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0px var(--theme-contrast); transition: all 0.1s; text-transform: uppercase; margin-top: 20px; }
+        .btn-action:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--theme-contrast); }
+        .quiz-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--bg-color); border-top: 3px solid var(--border-color); padding: 15px 20px; display: none; justify-content: space-between; align-items: center; z-index: 100; }
+        .nav-btn { padding: 12px 24px; border-radius: 8px; font-weight: 800; border: 2px solid var(--border-color); cursor: pointer; box-shadow: 2px 2px 0px var(--border-color); font-family: 'Poppins', sans-serif; text-transform: uppercase;}
+        .btn-next { background-color: var(--theme-dark); color: white; }
+        .btn-prev { background-color: white; color: var(--text-color); }
+    </style>
 </head>
 <body>
-$END$
+<div class="container">
+    <header class="logo-header">
+        <div class="css-logo"><span class="pulse-effect">📍</span> PROMOVER</div>
+        <h1>Língua Portuguesa | IFCE</h1>
+        <p class="subtitle">Advérbios e Circunstâncias</p>
+    </header>
+    <div class="toggle-container">
+        <button class="toggle-btn active" id="btnExp" onclick="setMode('explanation')">Teoria</button>
+        <button class="toggle-btn" id="btnPrac" onclick="setMode('practice')">Prática (30)</button>
+    </div>
+
+    <div id="viewExplanation" class="view-section" style="display: flex;">
+        <div class="search-container">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+            <input type="text" id="searchInput" class="search-input" aria-label="Pesquisar conteúdo" placeholder="Pesquisar circunstância...">
+        </div>
+        <div id="no-results"><p>Termo não encontrado.</p></div>
+
+        <div class="content-group">
+            <span class="section-badge">1. O que é o Advérbio?</span>
+            <div class="theory-box">
+                <h3>O Modificador</h3>
+                <p>O advérbio é uma palavra <strong>invariável</strong> (não tem plural nem feminino) que modifica o sentido de três classes: o Verbo (correu <em>muito</em>), o Adjetivo (<em>muito</em> bonito) ou outro Advérbio (<em>muito</em> rapidamente).</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">2. As Circunstâncias</span>
+            <div class="theory-box">
+                <h3>O Cenário da Ação</h3>
+                <p>Eles indicam o "cenário" em que a ação ocorreu: <br>
+                    - <strong>Tempo:</strong> hoje, ontem, sempre.<br>
+                    - <strong>Lugar:</strong> aqui, lá, dentro.<br>
+                    - <strong>Modo:</strong> bem, mal, rapidamente.<br>
+                    - <strong>Intensidade:</strong> muito, pouco, bastante.<br>
+                    - <strong>Dúvida/Afirmação/Negação:</strong> talvez, sim, não.</p>
+            </div>
+        </div>
+
+        <div class="content-group">
+            <span class="section-badge">3. A Armadilha do Meio/Bastante</span>
+            <div class="theory-box">
+                <h3>Adjetivo vs. Advérbio</h3>
+                <p>Se a palavra estiver ligada a um substantivo, ela VAI VARIAR (Adjetivo ou Pronome). Se estiver ligada a um verbo ou adjetivo, NÃO VARIA (Advérbio).</p>
+                <div class="highlight-box warning">
+                    <strong>Cuidado no IFCE:</strong> "Ela está <em>meia</em> cansada" é <strong>ERRO GRAVE</strong>. Cansada é adjetivo, logo o modificador é advérbio e invariável. O certo é: "Ela está <strong>MEIO</strong> cansada" (um pouco cansada). Só use "meia" para metades (comi <em>meia</em> pizza).
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-action" onclick="setMode('practice')">Iniciar Diagnóstico (30 Q) →</button>
+    </div>
+
+    <div id="viewPractice" class="view-section">
+        <div style="margin-bottom: 20px; background-color: var(--white); padding: 15px; border-radius: 12px; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color);">
+            <h2 style="color:var(--theme-dark); font-weight:900; margin-bottom: 5px;">A Prova de Fogo</h2>
+            <p style="color: #0F172A; font-size: 0.95rem; font-weight:600;">30 questões rigorosas. Acerte <strong>80% (24/30)</strong> para provar seu domínio. Leia a correção de cada erro!</p>
+        </div>
+        <div class="question-map" id="qMap"></div>
+        <div id="quizContainer" style="margin-bottom: 100px;"></div>
+    </div>
+
+    <div id="viewResult" class="view-section">
+        <div class="result-card">
+            <h2 style="font-weight:900; text-transform:uppercase;">Relatório Final</h2>
+            <div class="stars-container" id="finalStars">★</div>
+            <div class="percentage-big" id="finalPercent">0%</div>
+            <p style="font-size:1.2rem; font-weight:700; color:#555;" id="finalScoreText">Você acertou 0 de 30</p>
+            <div id="review-container"></div>
+        </div>
+        <div id="action-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" id="quizFooter">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)">Anterior</button>
+    <button class="nav-btn btn-next" id="btnNext" onclick="changeQuestion(1)">Próxima</button>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const contentGroups = document.querySelectorAll('.content-group');
+    const noResultsMsg = document.getElementById('no-results');
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        let totalVisible = 0;
+        contentGroups.forEach(group => {
+            const textContent = group.textContent.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (textContent.includes(term)) {
+                group.style.display = 'flex';
+                totalVisible++;
+            } else {
+                group.style.display = 'none';
+            }
+        });
+        noResultsMsg.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    // BANCO DE DADOS - 30 QUESTÕES
+    const questions = [
+// FÁCEIS (1-10)
+        {
+            id: 1, level: "Fácil",
+            text: "Na frase 'Ela chegou ONTEM', o advérbio destacado expressa qual circunstância?",
+            options: ["Lugar", "Modo", "Tempo", "Intensidade"],
+            correct: 2,
+            explanation: {
+                correct: "'Ontem' responde à pergunta 'Quando?', indicando claramente a circunstância temporal em que o verbo ocorreu.",
+                options: ["Lugar responde a 'Onde?'.", "Modo responde a 'Como?'.", "A resposta certa é a C.", "Intensidade responde a 'Quanto?'."]
+            }
+        },
+        {
+            id: 2, level: "Fácil",
+            text: "Qual das palavras abaixo é um advérbio de LUGAR?",
+            options: ["Aqui", "Sempre", "Talvez", "Muitíssimo"],
+            correct: 0,
+            explanation: {
+                correct: "'Aqui' indica o espaço físico onde a ação se desenvolve (responde a 'Onde?').",
+                options: ["Sempre é tempo.", "Talvez é dúvida.", "A resposta certa é a A.", "Muitíssimo é intensidade."]
+            }
+        },
+        {
+            id: 3, level: "Fácil",
+            text: "Em 'O carro andava LENTAMENTE', o advérbio indica a circunstância de:",
+            options: ["Tempo", "Causa", "Intensidade", "Modo"],
+            correct: 3,
+            explanation: {
+                correct: "'Lentamente' mostra a maneira, a forma ou o modo como o carro executava a ação de andar.",
+                options: ["Não diz quando.", "Não diz o motivo.", "Não quantifica.", "A resposta certa é a D."]
+            }
+        },
+        {
+            id: 4, level: "Fácil",
+            text: "Qual destas frases possui um advérbio de NEGAÇÃO?",
+            options: ["Ele certamente estudou.", "Não fomos ao parque hoje.", "Talvez chova mais tarde.", "Ela fala muito alto."],
+            correct: 1,
+            explanation: {
+                correct: "A palavra 'Não' é o advérbio de negação absoluto, alterando o sentido positivo do verbo.",
+                options: ["Certamente = afirmação.", "A resposta certa é a B.", "Talvez = dúvida.", "Muito = intensidade."]
+            }
+        },
+        {
+            id: 5, level: "Fácil",
+            text: "Uma característica fundamental do advérbio, do ponto de vista gramatical, é que ele é uma palavra:",
+            options: ["Variável em gênero (masc/fem).", "Variável em número (sing/plural).", "Invariável.", "Conjugável (como o verbo)."],
+            correct: 2,
+            explanation: {
+                correct: "O advérbio não sofre flexão de plural nem de feminino. Ele permanece estático em sua forma original.",
+                options: ["Adjetivos variam.", "Substantivos variam.", "A resposta certa é a C.", "Apenas verbos conjugam."]
+            }
+        },
+        {
+            id: 6, level: "Fácil",
+            text: "Na oração 'Ele está MUITO doente', a palavra 'muito' atua como um advérbio de:",
+            options: ["Modo", "Intensidade", "Tempo", "Lugar"],
+            correct: 1,
+            explanation: {
+                correct: "'Muito' amplia a força do adjetivo 'doente', quantificando o grau da doença (intensidade).",
+                options: ["Não é a forma da doença.", "A resposta certa é a B.", "Não marca cronologia.", "Não é espaço."]
+            }
+        },
+        {
+            id: 7, level: "Fácil",
+            text: "O advérbio tem o poder principal de modificar três classes de palavras. Quais são?",
+            options: ["Substantivo, Artigo, Numeral.", "Verbo, Adjetivo, Advérbio.", "Pronome, Preposição, Conjunção.", "Apenas o Verbo."],
+            correct: 1,
+            explanation: {
+                correct: "Regra de ouro: o advérbio 'orbita' o verbo (correu muito), o adjetivo (muito bom) ou outro advérbio (muito bem).",
+                options: ["Se modifica substantivo, é adjetivo/pronome.", "A resposta certa é a B.", "Não tem poder sobre conectivos.", "Não é restrito só ao verbo."]
+            }
+        },
+        {
+            id: 8, level: "Fácil",
+            text: "Qual das palavras abaixo representa um advérbio de AFIRMAÇÃO?",
+            options: ["Nunca", "Jamais", "Realmente", "Acaso"],
+            correct: 2,
+            explanation: {
+                correct: "'Realmente', 'certamente', 'sim' confirmam o fato, não deixando margem para dúvidas.",
+                options: ["Negação.", "Negação.", "A resposta certa é a C.", "Dúvida."]
+            }
+        },
+        {
+            id: 9, level: "Fácil",
+            text: "A expressão 'COM CERTEZA' (formada por preposição + substantivo, mas com valor de advérbio) é classificada como:",
+            options: ["Locução Verbal", "Locução Adverbial", "Conjunção", "Pronome Relativo"],
+            correct: 1,
+            explanation: {
+                correct: "Duas ou mais palavras juntas (preposição + núcleo) que equivalem a um advérbio formam a Locução Adverbial.",
+                options: ["Não tem verbo.", "A resposta certa é a B.", "Não liga orações.", "Não retoma termos."]
+            }
+        },
+        {
+            id: 10, level: "Fácil",
+            text: "O sufixo formador de advérbios de modo mais comum na Língua Portuguesa é:",
+            options: ["-ção", "-dade", "-mente", "-oso"],
+            correct: 2,
+            explanation: {
+                correct: "Acréscimos como calma+mente, rápida+mente, feliz+mente geram advérbios de modo na maioria dos casos.",
+                options: ["Sufixo nominal.", "Sufixo nominal.", "A resposta certa é a C.", "Sufixo adjetivo."]
+            }
+        },
+
+// MÉDIAS (11-20)
+        {
+            id: 11, level: "Médio",
+            text: "Qual frase contém um ERRO de concordância relacionado à confusão entre Advérbio e Adjetivo?",
+            options: ["A porta estava meio aberta.", "Elas estão meias cansadas.", "Comi meia maçã no lanche.", "Os alunos falaram bastante."],
+            correct: 1,
+            explanation: {
+                correct: "'Cansada' é adjetivo. O termo que o modifica é o advérbio de intensidade (um pouco), que é invariável. O certo é 'MEIO cansadas'.",
+                options: ["Correto (advérbio invariável).", "A resposta certa é a B.", "Correto (numeral concorda com maçã).", "Correto (advérbio não varia)."]
+            }
+        },
+        {
+            id: 12, level: "Médio",
+            text: "Em 'Havia BASTANTES pessoas na fila', a palavra 'bastantes' está correta e no plural porque:",
+            options: ["Está errada, advérbio nunca vai para o plural.", "Funciona como pronome indefinido adjetivo (modificando o substantivo 'pessoas'), logo, deve concordar com ele.", "É um verbo.", "Toda palavra terminada em E vai pro plural."],
+            correct: 1,
+            explanation: {
+                correct: "Se equivale a 'muitas' (acompanha substantivo), varia. Se equivale a 'muito' (acompanha verbo/adjetivo), fica invariável (advérbio).",
+                options: ["Neste caso não é advérbio.", "A resposta certa é a B.", "Não conjuga.", "Regra inexistente."]
+            }
+        },
+        {
+            id: 13, level: "Médio",
+            text: "Analise: 'A mulher cantava ALTO'. A palavra 'alto' atua sintaticamente e morfologicamente como:",
+            options: ["Adjetivo, qualificando a mulher.", "Advérbio de modo, qualificando a forma como ela cantava (o verbo).", "Substantivo.", "Pronome."],
+            correct: 1,
+            explanation: {
+                correct: "Embora 'alto' nasça como adjetivo, aqui ele foi adverbializado para modificar a ação de cantar. Por isso fica invariável.",
+                options: ["A mulher não é alta fisicamente na frase.", "A resposta certa é a B.", "Não tem artigo antes.", "Não substitui nome."]
+            }
+        },
+        {
+            id: 14, level: "Médio",
+            text: "Leia: 'As provas foram corrigidas ÀS PRESSAS'. A expressão destacada é uma Locução Adverbial de:",
+            options: ["Lugar", "Tempo", "Modo", "Causa"],
+            correct: 2,
+            explanation: {
+                correct: "A locução indica a forma (a maneira, o modo) apressada como o professor corrigiu o material.",
+                options: ["Não indica onde.", "Não marca a hora (ex: às duas da tarde).", "A resposta certa é a C.", "Não é o motivo da correção."]
+            }
+        },
+        {
+            id: 15, level: "Médio",
+            text: "Em qual oração o advérbio está modificando um ADJETIVO?",
+            options: ["João correu muito.", "A menina é incrivelmente inteligente.", "Eles falam bem devagar.", "Ele dormiu aqui."],
+            correct: 1,
+            explanation: {
+                correct: "O advérbio 'incrivelmente' intensifica a qualidade expressa pelo adjetivo 'inteligente'.",
+                options: ["Modifica o verbo 'correu'.", "A resposta certa é a B.", "Advérbio 'bem' modifica o advérbio 'devagar'.", "Modifica o verbo 'dormiu'."]
+            }
+        },
+        {
+            id: 16, level: "Médio",
+            text: "A frase 'Ele só comeu o bolo' é diferente de 'Só ele comeu o bolo'. Isso prova que:",
+            options: ["A gramática é falha.", "A posição do advérbio ('só') altera o foco da restrição, mudando toda a lógica semântica da frase.", "As duas frases são idênticas no sentido.", "A palavra 'só' é um adjetivo."],
+            correct: 1,
+            explanation: {
+                correct: "Deslocar o advérbio muda quem ele modifica. Na primeira, ele restringe o objeto (apenas bolo). Na segunda, restringe o sujeito (apenas ele).",
+                options: ["A gramática é precisa.", "A resposta certa é a B.", "A semântica difere totalmente.", "Aqui é advérbio de exclusão/palavra denotativa."]
+            }
+        },
+        {
+            id: 17, level: "Médio",
+            text: "A maioria das palavras terminadas em '-mente' indica MODO. Assinale a exceção que indica TEMPO:",
+            options: ["Lentamente", "Ferozmente", "Diariamente", "Calmamente"],
+            correct: 2,
+            explanation: {
+                correct: "'Diariamente' refere-se à frequência temporal (todos os dias), respondendo à pergunta 'Quando/com que frequência?'.",
+                options: ["Modo.", "Modo.", "A resposta certa é a C.", "Modo."]
+            }
+        },
+        {
+            id: 18, level: "Médio",
+            text: "Identifique a circunstância da locução adverbial em: 'O cão morreu DE FOME'.",
+            options: ["Modo", "Lugar", "Companhia", "Causa"],
+            correct: 3,
+            explanation: {
+                correct: "A expressão 'de fome' explica o motivo, a razão, o fato gerador que levou à morte do animal. É a Causa.",
+                options: ["A fome não é a maneira.", "Não é espaço físico.", "Ele não estava acompanhado da fome.", "A resposta certa é a D."]
+            }
+        },
+        {
+            id: 19, level: "Médio",
+            text: "Em 'Fui ao cinema COM MEU IRMÃO', a locução adverbial 'com meu irmão' indica circunstância de:",
+            options: ["Instrumento", "Meio", "Companhia", "Modo"],
+            correct: 2,
+            explanation: {
+                correct: "A preposição 'com' + pessoa indica que o sujeito realizou a ação acompanhado por outro ser.",
+                options: ["Instrumento usa objeto (com a faca).", "Meio seria (fui de carro).", "A resposta certa é a C.", "Modo não foca no parceiro."]
+            }
+        },
+        {
+            id: 20, level: "Médio",
+            text: "Em 'Eles estão MUITO MAL informados', o advérbio 'muito' está intensificando:",
+            options: ["O pronome 'Eles'.", "O verbo 'estão'.", "O adjetivo 'informados'.", "O advérbio 'mal'."],
+            correct: 3,
+            explanation: {
+                correct: "A sintaxe aqui forma uma cadeia: 'informados' é adjetivo; 'mal' modifica informados (advérbio); e 'muito' modifica 'mal' (advérbio sobre advérbio).",
+                options: ["Advérbio não modifica pronome.", "Não intensifica o estado puro de estar.", "O modificador direto de informados é 'mal'.", "A resposta certa é a D."]
+            }
+        },
+
+// DIFÍCEIS (21-30)
+        {
+            id: 21, level: "Difícil",
+            text: "Qual é o valor semântico do advérbio 'JÁ' na frase: 'A paciência do professor JÁ acabou'?",
+            options: ["Apenas tempo passado.", "Mudança de estado (antes havia paciência, agora não mais).", "Dúvida temporal.", "Lugar metafórico."],
+            correct: 1,
+            explanation: {
+                correct: "O 'já' não é um mero marcador de relógio. Ele indica o limite exato onde um estado antigo se rompeu e um novo estado começou.",
+                options: ["É mais do que passado inerte.", "A resposta certa é a B.", "É certeza.", "Não indica espaço."]
+            }
+        },
+        {
+            id: 22, level: "Difícil",
+            text: "O advérbio 'AINDA' pode causar ambiguidade. Em 'O aluno AINDA está lendo', ele indica:",
+            options: ["Inclusão (além dos outros, ele também lê).", "Continuidade de uma ação no tempo (esperava-se que tivesse terminado, mas não).", "Causa da leitura.", "Negação disfarçada."],
+            correct: 1,
+            explanation: {
+                correct: "O 'ainda' tem valor de duratividade/aspecto contínuo, frustrando a expectativa de fim da ação.",
+                options: ["Inclusão seria: 'Ainda (inclusive) o aluno participou'.", "A resposta certa é a B.", "Não é motivo.", "Ele está lendo (afirmação)."]
+            }
+        },
+        {
+            id: 23, level: "Difícil",
+            text: "Na estrutura 'INFELIZMENTE, os dados vazaram', o advérbio no início da frase com vírgula funciona como:",
+            options: ["Advérbio de intensidade.", "Adjunto adnominal do sujeito.", "Modalizador discursivo que projeta a opinião e o sentimento do autor sobre toda a frase.", "Erro de pontuação."],
+            correct: 2,
+            explanation: {
+                correct: "Advérbios deslocados no início que não focam no verbo, mas no juízo de valor sobre o fato inteiro, são chamados modalizadores de opinião.",
+                options: ["Não intensifica verbo.", "Advérbio nunca é adnominal.", "A resposta certa é a C.", "Vírgula é obrigatória ou recomendada no deslocamento."]
+            }
+        },
+        {
+            id: 24, level: "Difícil",
+            text: "Os Advérbios Interrogativos de CAUSA. Em 'POR QUE você fez isso?', a expressão 'Por que' equivale logicamente a:",
+            options: ["Onde", "Por qual motivo", "Quando", "De que modo"],
+            correct: 1,
+            explanation: {
+                correct: "O 'por que' (separado) questiona a circunstância causal que engatilhou a ação. Pede uma explicação (o motivo).",
+                options: ["Lugar.", "A resposta certa é a B.", "Tempo.", "Modo."]
+            }
+        },
+        {
+            id: 25, level: "Difícil",
+            text: "O aluno IFCE sabe diferenciar Mau x Mal. Em qual frase 'MAL' atua corretamente como ADVÉRBIO de modo?",
+            options: ["Ele é um mal aluno.", "O lobo mal uivou.", "O time jogou muito mal ontem.", "O mal sempre perde."],
+            correct: 2,
+            explanation: {
+                correct: "'Mal' (com L) é advérbio de modo (contrário de BEM) e modifica o verbo 'jogar'. 'Mau' (com U) é adjetivo (contrário de BOM).",
+                options: ["Deveria ser 'mau' (adjetivo).", "Deveria ser 'mau' (adjetivo).", "A resposta certa é a C.", "Aqui é substantivo (O mal)."]
+            }
+        },
+        {
+            id: 26, level: "Difícil",
+            text: "Qual frase contém uma Locução Adverbial de INSTRUMENTO?",
+            options: ["Trabalhou com alegria.", "Feriu-se com a tesoura.", "Chegou com a chuva.", "Saiu com a irmã."],
+            correct: 1,
+            explanation: {
+                correct: "A tesoura é a ferramenta (o instrumento) físico utilizado pelo sujeito para executar (ou sofrer) a ação verbal.",
+                options: ["Modo.", "A resposta certa é a B.", "Tempo (simultaneidade).", "Companhia."]
+            }
+        },
+        {
+            id: 27, level: "Difícil",
+            text: "Palavras Denotativas (que a NGB tira da classe dos advérbios puros) de INCLUSÃO. Qual frase contém uma?",
+            options: ["Somente ele passou.", "Exceto João, todos riram.", "Até as pedras choraram.", "Não sei o que fazer."],
+            correct: 2,
+            explanation: {
+                correct: "A palavra 'Até', nesse contexto, joga as pedras para dentro do conjunto de pessoas que choraram (inclusão de elemento extremo).",
+                options: ["Exclusão/Restrição.", "Exclusão.", "A resposta certa é a C.", "Negação pura."]
+            }
+        },
+        {
+            id: 28, level: "Difícil",
+            text: "Regra Estilística de Coordenação: Quando usamos dois advérbios terminados em '-mente' ligados por conjunção, o que deve ocorrer na norma culta?",
+            options: ["Ambos perdem o sufixo.", "Ambos mantêm o sufixo obrigatoriamente.", "Omitimos o sufixo do primeiro e mantemos o do último (Ex: Lenta e silenciosamente).", "Omitimos o do último."],
+            correct: 2,
+            explanation: {
+                correct: "Para evitar cacofonia e repetição cansativa (lentamente e silenciosamente), a regra elegante dita a suspensão do primeiro sufixo.",
+                options: ["Perdem a marca adverbial.", "Aceitável, mas deselegante/pesado.", "A resposta certa é a C.", "A regra pede a manutenção no último para fechar o bloco."]
+            }
+        },
+        {
+            id: 29, level: "Difícil",
+            text: "A ambiguidade estrutural causada pelo deslocamento do advérbio. 'O aluno que estuda SEMPRE passa'. O 'sempre' modifica quem?",
+            options: ["Apenas 'estuda'.", "Apenas 'passa'.", "Gera duplo sentido: ou ele estuda sempre, ou ele passa sempre.", "Anula os dois verbos."],
+            correct: 2,
+            explanation: {
+                correct: "A posição imprensada entre dois verbos cria ambiguidade. Sem vírgulas, o leitor não sabe se a ação contínua é o estudo ou a aprovação.",
+                options: ["A sintaxe não deixa isso claro.", "A sintaxe não deixa claro.", "A resposta certa é a C.", "Não tem valor negativo."]
+            }
+        },
+        {
+            id: 30, level: "Difícil",
+            text: "A Derivação Imprópria (Substantivação) de um Advérbio ocorre na frase:",
+            options: ["Ele disse não.", "O não do chefe foi definitivo.", "Não quero ir.", "Ninguém respondeu não."],
+            correct: 1,
+            explanation: {
+                correct: "A presença do artigo 'O' transforma o advérbio de negação 'não' em um substantivo que atua como núcleo do sujeito.",
+                options: ["Advérbio comum.", "A resposta certa é a B.", "Advérbio negando verbo.", "Advérbio de negação padrão."]
+            }
+        }
+    ];
+
+    // --- SISTEMA DE SALVAMENTO (LOCALSTORAGE) E LÓGICA ---
+    const storageKey = 'promover_quiz_' + document.title.replace(/\s+/g, '_');
+    let currentQuestion = 0;
+    let savedAnswers = localStorage.getItem(storageKey);
+    let userAnswers = savedAnswers ? JSON.parse(savedAnswers) : new Array(questions.length).fill(null);
+
+    function setMode(mode) {
+        const views = ['viewExplanation', 'viewPractice', 'viewResult'];
+        views.forEach(v => document.getElementById(v).style.display = 'none');
+        document.getElementById('quizFooter').style.display = 'none';
+
+        if(mode === 'explanation') {
+            document.getElementById('viewExplanation').style.display = 'flex';
+            document.getElementById('btnExp').classList.add('active');
+            document.getElementById('btnPrac').classList.remove('active');
+        } else if (mode === 'practice') {
+            document.getElementById('viewPractice').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'flex';
+            document.getElementById('btnExp').classList.remove('active');
+            document.getElementById('btnPrac').classList.add('active');
+            renderQuestion();
+            renderMap();
+        } else if (mode === 'result') {
+            document.getElementById('viewResult').style.display = 'block';
+            document.getElementById('quizFooter').style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    function renderQuestion() {
+        if(questions.length === 0) return;
+        const q = questions[currentQuestion];
+        const container = document.getElementById('quizContainer');
+        const letters = ['A', 'B', 'C', 'D'];
+        const ans = userAnswers[currentQuestion];
+        let badgeClass = '';
+
+        if(q.level === 'Fácil') badgeClass = 'dif-facil';
+        else if(q.level === 'Médio') badgeClass = 'dif-medio';
+        else badgeClass = 'dif-dificil';
+
+        container.innerHTML = `
+<div class="card-content" style="border: 3px solid var(--border-color); box-shadow: 4px 4px 0px var(--border-color); padding: 15px; border-radius: 12px; background: white;">
+<span class="difficulty-badge ${badgeClass}">${q.level}</span>
+<div style="margin-bottom: 20px;">
+<span style="font-size: 0.8rem; font-weight: 800; color: var(--theme-dark);">QUESTÃO ${currentQuestion + 1} DE ${questions.length}</span>
+<h2 style="font-size: 1.15rem; margin-top: 5px; color: var(--text-color); font-weight: 900;">${q.text}</h2>
+</div>
+<div class="options-list">
+${q.options.map((opt, i) => {
+            let cls = '';
+            if (ans !== null) {
+                if (i === q.correct) cls = 'correct';
+                else if (i === ans) cls = 'wrong';
+                else cls = 'disabled';
+            }
+            return `<button class="option-btn ${cls}" onclick="handleAnswer(${i})" ${ans !== null ? 'disabled' : ''}>
+<div class="opt-circle">${letters[i]}</div>
+<div>${opt}</div>
+</button>`
+        }).join('')}
+</div>
+
+${ans !== null ? `
+<div class="feedback-box">
+<div class="feedback-title" style="color:${ans === q.correct ? 'var(--correct-border)' : 'var(--wrong-border)'}">
+${ans === q.correct ? '☑ Raciocínio Aprovado!' : '☒ Ops! Falha Detectada!'}
+</div>
+<div class="feedback-item correct-opt"><strong>A Verdade Direta e Certa:</strong> ${q.options[q.correct]}</div>
+<div style="margin-top:10px; font-size:0.95rem; color:var(--text-color); margin-bottom:15px; font-weight:600;">
+${q.explanation.correct}
+</div>
+<div style="margin-top:15px; border-top:1px dashed var(--theme-light); padding-top:10px;">
+<small style="color:var(--theme-dark);"><strong>Diagnóstico das Rasteiras e Distratores:</strong></small>
+${q.explanation.options.map((exp, i) => i !== q.correct ? `<div class="feedback-item wrong-opt" style="margin-top:8px;"><strong>${letters[i]})</strong> ${exp}</div>` : '').join('')}
+</div>
+</div>
+` : ''}
+</div>`;
+        updateNav();
+    }
+
+    function handleAnswer(idx) {
+        if (userAnswers[currentQuestion] !== null) return;
+        userAnswers[currentQuestion] = idx;
+        localStorage.setItem(storageKey, JSON.stringify(userAnswers));
+
+        if (idx === questions[currentQuestion].correct) {
+            const duration = 1500;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: {x: 0, y: 0.6 }, colors: ['#0284C7', '#38BDF8', '#D97706', '#0F172A'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: {x: 1, y: 0.6}, colors: ['#0284C7', '#38BDF8', '#D97706', '#0F172A'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        } else {
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.classList.remove('shake-effect');
+            void quizContainer.offsetWidth;
+            quizContainer.classList.add('shake-effect');
+            setTimeout(() => quizContainer.classList.remove('shake-effect'), 500);
+        }
+        renderQuestion();
+        renderMap();
+    }
+
+    function renderMap() {
+        if(questions.length === 0) return;
+        const map = document.getElementById('qMap');
+        map.innerHTML = questions.map((q, i) => {
+            let cls = 'map-dot';
+            if (i === currentQuestion) cls += ' active';
+            if (userAnswers[i] !== null) {
+                cls += userAnswers[i] === q.correct ? ' answered-correct' : ' answered-wrong';
+            }
+            return `<div class="${cls}" onclick="goTo(${i})">${i + 1}</div>`;
+        }).join('');
+
+        setTimeout(() => {
+            const activeDot = map.querySelector('.map-dot.active');
+            if (activeDot) {
+                activeDot.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }, 50);
+    }
+
+    function goTo(i) {
+        if (window.confetti) confetti.reset();
+        currentQuestion = i;
+        renderQuestion();
+        renderMap();
+    }
+
+    function changeQuestion(d) {
+        let n = currentQuestion + d;
+        if (n >= 0 && n < questions.length) goTo(n);
+    }
+
+    function updateNav() {
+        document.getElementById('btnPrev').disabled = (currentQuestion === 0);
+        const next = document.getElementById('btnNext');
+        if (currentQuestion === questions.length - 1) {
+            next.textContent = "Finalizar Diagnóstico";
+            next.onclick = finish;
+        } else {
+            next.textContent = "Avançar";
+            next.onclick = () => changeQuestion(1);
+        }
+    }
+
+    function finish() {
+        let correct = userAnswers.filter((a, i) => a === questions[i].correct).length;
+        let percent = Math.round((correct / questions.length) * 100);
+        if (window.confetti) confetti.reset();
+
+        document.getElementById('finalPercent').textContent = percent + "%";
+        document.getElementById('finalScoreText').textContent = `Você acertou ${correct} de ${questions.length} questões.`;
+        document.getElementById('finalStars').textContent = percent >= 80 ? "★★★★★" : percent >= 60 ? "★★★☆☆" : "★☆☆☆☆";
+
+        let summary = '<div style="text-align:left; margin-top:20px;">';
+        if (percent < 80) {
+            summary += `<div style="background:var(--wrong-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--wrong-border); color:var(--wrong-border);">
+<strong>⚠ Domínio Insuficiente!</strong> O seu desempenho não atingiu a nota de corte (80%). Atingir a pontuação mínima é obrigatório nesta prova. Revise a teoria com rigor antes de tentar novamente.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Limpar Histórico e Refazer Prova</button>';
+        } else {
+            summary += `<div style="background:var(--correct-bg); padding:15px; border-radius:8px; margin-bottom:20px; border:2px solid var(--correct-border); color:var(--correct-border);">
+<strong>★ Excelente Desempenho!</strong> Você demonstrou uma base sólida, clínica e exata sobre os conceitos avaliados. A sua aprovação técnica está garantida neste módulo.</div>`;
+            document.getElementById('action-buttons').innerHTML = '<button class="btn-action" onclick="reset()"> Refazer Prova (Zerar Histórico)</button>';
+        }
+
+        if (correct < questions.length) {
+            summary += '<h4 style="margin-bottom:10px; color:var(--text-color);">Relatório de Falhas e Correções:</h4>';
+            questions.forEach((q, i) => {
+                if(userAnswers[i] !== q.correct && userAnswers[i] !== null) {
+                    summary += `<div style="margin-bottom:10px; padding:15px; background:var(--white); border-radius:8px; border:2px dashed var(--theme-dark);">
+<strong style="color:var(--theme-dark);">Q${i+1}:</strong> ${q.text}<br>
+<span style="color:var(--wrong-border); font-size:0.9rem; font-weight:600; display:block; margin-top:5px;">Seu Erro: ${q.options[userAnswers[i]]}</span>
+<span style="color:var(--correct-border); font-size:0.9rem; font-weight:600; display:block; margin-top:2px;">A Verdade: ${q.options[q.correct]}</span>
+</div>`;
+                }
+            });
+        }
+        summary += '</div>';
+        document.getElementById('review-container').innerHTML = summary;
+        setMode('result');
+    }
+
+    function reset() {
+        localStorage.removeItem(storageKey);
+        userAnswers = new Array(questions.length).fill(null);
+        currentQuestion = 0;
+        setMode('practice');
+    }
+
+    setMode(userAnswers.some(ans => ans !== null) ? 'practice' : 'explanation');
+</script>
 </body>
 </html>
